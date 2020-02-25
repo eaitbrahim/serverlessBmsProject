@@ -1,0 +1,23 @@
+{
+  "name": "serverlessBmsProject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eaitbrahim/serverlessBmsProject.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eaitbrahim/serverlessBmsProject/issues"
+  },
+  "homepage": "https://github.com/eaitbrahim/serverlessBmsProject#readme",
+  "dependencies": {
+    "aws-sdk": "^2.625.0"
+  }
+}

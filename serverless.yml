@@ -6,7 +6,9 @@ provider:
   profile: bmsAccount
   region: eu-central-1
   environment:
-    tableName: ${self:custom.tableName}
+    tableNameConnection: ${self:custom.tableNameConnection}
+    tableNameSystem: ${self:custom.tableNameSystem}
+    tableNameData: ${self:custom.tableNameData}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -14,7 +16,9 @@ provider:
       Resource: '*'
 
 custom:
-  tableName: BmsSystems
+  tableNameConnection: Connections
+  tableNameSystem: Systems
+  tableNameData: PrimaryData
 
 functions:
   websocket-connect:
@@ -32,22 +36,53 @@ functions:
     events:
       - websocket:
           route: $default
-  websocket-message:
-    handler: lambdas/websockets/message.handler
+  websocket-system:
+    handler: lambdas/websockets/system.handler
     events:
       - websocket:
-          route: message
+          route: system
+  websocket-primaryd-data:
+    handler: lambdas/websockets/primaryd-data.handler
+    events:
+      - websocket:
+          route: primaryd-data
 
 resources:
   Resources:
-    WebsocketBmsTable:
+    ConnectionsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.tableName}
+        TableName: ${self:custom.tableNameConnection}
         AttributeDefinitions:
-          - AttributeName: ID
+          - AttributeName: ConnectionId
             AttributeType: S
         KeySchema:
-          - AttributeName: ID
+          - AttributeName: ConnectionId
             KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    SystemsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableNameSystem}
+        AttributeDefinitions:
+          - AttributeName: BMSHWRSN
+            AttributeType: S
+        KeySchema:
+          - AttributeName: BMSHWRSN
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    PrimaryDataTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableNameData}
+        AttributeDefinitions:
+          - AttributeName: BMSHWRSN
+            AttributeType: S
+          - AttributeName: Id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: BMSHWRSN
+            KeyType: HASH
+          - AttributeName: Id
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST

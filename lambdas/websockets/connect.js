@@ -1,20 +1,18 @@
 const Responses = require('../common/API_Responses');
 const Dynamo = require('../common/Dynamo');
 
-const tableName = process.env.tableName;
-
 exports.handler = async event => {
   console.log('event', event);
 
-  const { connectionId: connectionID } = event.requestContext;
+  const { connectionId: ConnectionId } = event.requestContext;
 
   const data = {
-    ID: connectionID,
-    date: Date.now(),
-    messages: []
+    ConnectionId,
+    System: 'Init',
+    ConnectionDate: Date.now()
   };
 
-  await Dynamo.write(data, tableName);
+  await Dynamo.writeConnection(data, process.env.tableNameConnection);
 
   return Responses._200({ message: 'connected' });
 };

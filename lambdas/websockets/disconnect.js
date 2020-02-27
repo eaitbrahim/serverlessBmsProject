@@ -7,7 +7,7 @@ exports.handler = async event => {
   const { connectionId: ConnectionId } = event.requestContext;
 
   try {
-    // Set system offline
+    // Fetch system from connection
     let params = {
       TableName: process.env.tableNameConnection,
       Key: {
@@ -17,6 +17,13 @@ exports.handler = async event => {
 
     const { System } = await Dynamo.get(params);
 
+    // Delete connection
+    await Dynamo.deleteConnection(
+      ConnectionId,
+      process.env.tableNameConnection
+    );
+
+    // Set system offline
     params = {
       TableName: process.env.tableNameSystem,
       Key: {
@@ -30,12 +37,6 @@ exports.handler = async event => {
     };
 
     await Dynamo.write(data, process.env.tableNameSystem);
-
-    // Delete connection
-    await Dynamo.deleteConnection(
-      ConnectionId,
-      process.env.tableNameConnection
-    );
 
     return Responses._200({ message: `disconnected` });
   } catch (error) {

@@ -41,11 +41,11 @@ functions:
     events:
       - websocket:
           route: system
-  websocket-primaryd-data:
-    handler: lambdas/websockets/primaryd-data.handler
+  websocket-primary-data:
+    handler: lambdas/websockets/primary-data.handler
     events:
       - websocket:
-          route: primaryd-data
+          route: primary-data
 
 resources:
   Resources:

@@ -5,8 +5,8 @@ exports.handler = async event => {
   console.log('event', event);
 
   const { connectionId: ConnectionId } = event.requestContext;
-
   const body = JSON.parse(event.body);
+
   const {
     Id,
     Localtime,
@@ -32,14 +32,22 @@ exports.handler = async event => {
     TModMinID,
     TModMaxID,
     HIBattery,
-    Reserved,
-    CreatedAt
+    Reserved
   } = body;
 
   try {
+    const params = {
+      TableName: process.env.tableNameConnection,
+      Key: {
+        ConnectionId
+      }
+    };
+
+    const { System } = await Dynamo.get(params);
+
     const data = {
-      BMSHWRSN: ConnectionId,
-      Id,
+      BMSHWRSN: System,
+      Id: String(Id),
       Localtime,
       HB1,
       SOC,
@@ -64,7 +72,7 @@ exports.handler = async event => {
       TModMaxID,
       HIBattery,
       Reserved,
-      CreatedAt
+      CreatedAt: Date.now()
     };
 
     await Dynamo.write(data, process.env.tableNameData);

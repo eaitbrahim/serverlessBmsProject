@@ -4,12 +4,12 @@ const Dynamo = require('../common/Dynamo');
 exports.handler = async event => {
   console.log('event', event);
 
-  const { connectionId: ConnectionID } = event.requestContext;
+  const { connectionId: ConnectionId } = event.requestContext;
 
   try {
     // Set system offline
     const { System } = await Dynamo.get(
-      ConnectionID,
+      ConnectionId,
       process.env.tableNameConnection
     );
 
@@ -23,7 +23,7 @@ exports.handler = async event => {
     await Dynamo.write(data, tableNameSystem);
 
     // Delete connection
-    await Dynamo.delete(ConnectionID, process.env.tableNameConnection);
+    await Dynamo.delete(ConnectionId, process.env.tableNameConnection);
     return Responses._200({ message: `disconnected` });
   } catch (error) {
     return Responses._400({ message: 'disconnection could not be updated' });

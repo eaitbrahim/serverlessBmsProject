@@ -3,14 +3,7 @@ const AWS = require('aws-sdk');
 const documentClient = new AWS.DynamoDB.DocumentClient();
 
 const Dynamo = {
-  async get(Id, TableName) {
-    const params = {
-      TableName,
-      Key: {
-        Id
-      }
-    };
-
+  async get(params) {
     const data = await documentClient.get(params).promise();
 
     if (!data || !data.Item) {
@@ -18,7 +11,6 @@ const Dynamo = {
         `There was an error fetching the data for ID of ${Id} from ${TableName}`
       );
     }
-    console.log(data);
 
     return data.Item;
   },

@@ -4,7 +4,7 @@ const Dynamo = require('../common/Dynamo');
 exports.handler = async event => {
   console.log('event', event);
 
-  const { connectionId: connectionID } = event.requestContext;
+  const { connectionId: ConnectionId } = event.requestContext;
 
   const body = JSON.parse(event.body);
   const {
@@ -38,7 +38,7 @@ exports.handler = async event => {
 
   try {
     const data = {
-      BMSHWRSN: connectionID,
+      BMSHWRSN: ConnectionId,
       Id,
       Localtime,
       HB1,

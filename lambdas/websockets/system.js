@@ -34,8 +34,6 @@ exports.handler = async event => {
       process.env.tableNameConnection
     );
 
-    console.log('BMSHWRSN:', BMSHWRSN);
-
     // create new systen
     const data = {
       MacA,
@@ -48,7 +46,6 @@ exports.handler = async event => {
       IsOnline: true
     };
 
-    console.log('data:', data);
     await Dynamo.write(data, process.env.tableNameSystem);
     return Response._200({ message: 'System online' });
   } catch (error) {

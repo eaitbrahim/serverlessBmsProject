@@ -8,22 +8,35 @@ exports.handler = async event => {
 
   try {
     // Set system offline
-    const { System } = await Dynamo.get(
-      ConnectionId,
-      process.env.tableNameConnection
-    );
+    let params = {
+      TableName: process.env.tableNameConnection,
+      Key: {
+        ConnectionId
+      }
+    };
 
-    const system = await Dynamo.get(System, process.env.tableNameSystem);
+    const { System } = await Dynamo.get(params);
 
+    params = {
+      TableName: process.env.tableNameSystem,
+      Key: {
+        BMSHWRSN: System
+      }
+    };
+    const system = await Dynamo.get(params);
     const data = {
       ...system,
       IsOnline: false
     };
 
-    await Dynamo.write(data, tableNameSystem);
+    await Dynamo.write(data, process.env.tableNameSystem);
 
     // Delete connection
-    await Dynamo.delete(ConnectionId, process.env.tableNameConnection);
+    await Dynamo.deleteConnection(
+      ConnectionId,
+      process.env.tableNameConnection
+    );
+
     return Responses._200({ message: `disconnected` });
   } catch (error) {
     return Responses._400({ message: 'disconnection could not be updated' });

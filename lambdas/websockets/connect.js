@@ -4,12 +4,18 @@ const Dynamo = require('../common/Dynamo');
 exports.handler = async event => {
   console.log('event', event);
 
-  const { connectionId: ConnectionId } = event.requestContext;
+  const {
+    connectionId: ConnectionId,
+    domainName: DomainName,
+    stage: Stage
+  } = event.requestContext;
 
   const data = {
     ConnectionId,
     System: 'Init',
-    ConnectionDate: Date.now()
+    ConnectionDate: Date.now(),
+    DomainName,
+    Stage
   };
 
   await Dynamo.writeConnection(data, process.env.tableNameConnection);

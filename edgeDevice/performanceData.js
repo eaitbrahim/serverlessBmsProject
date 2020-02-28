@@ -45,9 +45,10 @@ const getPrimaryData = () => {
         });
         return data;
       })
-      .then(({ performanceData }) => {
+      .then(({ BMSHWRSN, performanceData }) => {
         if (performanceData.length > 0) {
           repo.updateSyncLog({
+            BMSHWRSN,
             SyncDate: Date.now(),
             SyncComment: 'Processing',
             Processing: 1,
@@ -64,4 +65,17 @@ const getPrimaryData = () => {
   });
 };
 
-module.exports = { getSystem, getPrimaryData };
+const setProcessedData = data => {
+  return new Promise((resolve, reject) => {
+    repo.updateSyncLog({
+      BMSHWRSN: data.BMSHWRSN,
+      SyncDate: Date.now(),
+      SyncComment: 'Processed',
+      Processing: 1,
+      Processed: 1,
+      performanceData: [data.Id]
+    });
+  });
+};
+
+module.exports = { getSystem, getPrimaryData, setProcessedData };

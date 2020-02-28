@@ -18,7 +18,9 @@ class Repository {
 
   updateSyncLog(syncLog) {
     console.log('Updating logs...');
+    console.log('syncLog:', syncLog);
     const {
+      BMSHWRSN,
       SyncDate,
       SyncComment,
       Processing,
@@ -26,10 +28,10 @@ class Repository {
       performanceData
     } = syncLog;
     return this.dao.run(
-      `UPDATE SyncLog SET SyncDate=?, SyncComment=?, Processing=?, Processed=? WHERE PrimaryDataId IN (${performanceData.join(
+      `UPDATE SyncLog SET SyncDate=?, SyncComment=?, Processing=?, Processed=? WHERE SystemId = (SELECT Id From System WHERE BMSHWRSN=?) AND PrimaryDataId IN (${performanceData.join(
         ','
       )})`,
-      [SyncDate, SyncComment, Processing, Processed]
+      [SyncDate, SyncComment, Processing, Processed, BMSHWRSN]
     );
   }
 

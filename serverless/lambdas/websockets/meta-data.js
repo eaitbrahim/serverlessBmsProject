@@ -7,36 +7,31 @@ exports.handler = async event => {
   const { connectionId: ConnectionId } = event.requestContext;
 
   try {
-    // Fetch system from connection
-    let params = {
+    //Map connection id with a system
+    const params = {
       TableName: process.env.tableNameConnection,
       Key: {
         ConnectionId
       }
     };
+    const connection = await Dynamo.get(params);
 
-    const { System } = await Dynamo.get(params);
-
-    // Delete connection
-    await Dynamo.deleteConnection(
-      ConnectionId,
+    const body = JSON.parse(event.body);
+    await Dynamo.writeConnection(
+      {
+        ...connection,
+        System: body.BMSHWRSN
+      },
       process.env.tableNameConnection
     );
 
-    // Set system offline
-    params = {
-      TableName: process.env.tableNameSystem,
-      Key: {
-        BMSHWRSN: System
-      }
-    };
-    const system = await Dynamo.get(params);
+    // Insert meta data of the system
     const data = {
-      ...system,
-      IsOnline: false
+      ...body,
+      IsOnline: true
     };
 
-    await Dynamo.write(data, process.env.tableNameSystem);
+    await Dynamo.write(data, process.env.tableNameMetaData);
 
     return Responses._200({ message: `disconnected` });
   } catch (error) {

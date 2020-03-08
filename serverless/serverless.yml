@@ -7,8 +7,9 @@ provider:
   region: eu-central-1
   environment:
     tableNameConnection: ${self:custom.tableNameConnection}
-    tableNameSystem: ${self:custom.tableNameSystem}
-    tableNameData: ${self:custom.tableNameData}
+    tableNameCanMapping: ${self:custom.tableNameCanMapping}
+    tableNameMetaData: ${self:custom.tableNameMetaData}
+    tableNamePrimaryData: ${self:custom.tableNamePrimaryData}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -17,8 +18,9 @@ provider:
 
 custom:
   tableNameConnection: Connections
-  tableNameSystem: Systems
-  tableNameData: PrimaryData
+  tableNameCanMapping: CanMapping
+  tableNameMetaData: MetaData
+  tableNamePrimaryData: PrimaryData
 
 functions:
   websocket-connect:
@@ -36,11 +38,16 @@ functions:
     events:
       - websocket:
           route: $default
-  websocket-system:
-    handler: lambdas/websockets/system.handler
+  websocket-can-mapping:
+    handler: lambdas/websockets/can-mapping.handler
     events:
       - websocket:
-          route: system
+          route: can-mapping
+  websocket-meta-data:
+    handler: lambdas/websockets/meta-data.handler
+    events:
+      - websocket:
+          route: meta-data
   websocket-primary-data:
     handler: lambdas/websockets/primary-data.handler
     events:
@@ -60,10 +67,21 @@ resources:
           - AttributeName: ConnectionId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-    SystemsTable:
+    CanMappingTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.tableNameSystem}
+        TableName: ${self:custom.tableNameCanMapping}
+        AttributeDefinitions:
+          - AttributeName: BMSHWRSN
+            AttributeType: S
+        KeySchema:
+          - AttributeName: BMSHWRSN
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    MataDataTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableNameMetaData}
         AttributeDefinitions:
           - AttributeName: BMSHWRSN
             AttributeType: S
@@ -74,15 +92,15 @@ resources:
     PrimaryDataTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.tableNameData}
+        TableName: ${self:custom.tableNamePrimaryData}
         AttributeDefinitions:
           - AttributeName: BMSHWRSN
             AttributeType: S
-          - AttributeName: Id
+          - AttributeName: ReceivedDateTime
             AttributeType: S
         KeySchema:
           - AttributeName: BMSHWRSN
             KeyType: HASH
-          - AttributeName: Id
+          - AttributeName: ReceivedDateTime
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST

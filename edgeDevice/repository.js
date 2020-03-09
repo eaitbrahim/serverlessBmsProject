@@ -3,9 +3,9 @@ class Repository {
     this.dao = dao;
   }
 
-  getSystemInfo(id) {
-    console.log('Reading system info...');
-    return this.dao.get(`SELECT * FROM System WHERE Id = ?`, [id]);
+  getMetaData() {
+    console.log('Reading meta data...');
+    return this.dao.all(`SELECT * FROM MetaData`);
   }
 
   getNewPrimaryData() {

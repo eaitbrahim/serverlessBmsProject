@@ -1,11 +1,11 @@
 const os = require('os');
 const WebSocket = require('ws');
 
-const performanceData = require('./performanceData');
+const system = require('./system');
 //const syncLog = require('./syncLog');
 
 const ws = new WebSocket(
-  'wss://37be2u4eu1.execute-api.eu-central-1.amazonaws.com/dev'
+  'wss://5xcuq4dlm1.execute-api.eu-central-1.amazonaws.com/dev'
 );
 
 const nI = os.networkInterfaces();
@@ -24,34 +24,44 @@ for (let key in nI) {
 }
 
 ws.on('open', function open() {
-  // Initial read
-  performanceData.getSystem().then(allPerformanceData => {
-    allPerformanceData.MacA = MacA;
-    allPerformanceData.action = 'system';
-    if (allPerformanceData.BMSHWRSN !== '') {
-      console.log(`${Date.now()} Sending system info to the server.`);
-      ws.send(JSON.stringify(allPerformanceData));
+  // Read meta data
+  system.getMetaData().then(metaData => {
+    metaData.MacA = MacA;
+    metaData.action = 'meta-data';
+    if (metaData.BMSHWRSN !== '') {
+      console.log(`${Date.now()} Sending meta data to the server: ${metaData}`);
+      ws.send(JSON.stringify(metaData));
     }
   });
 
-  // start sending over data on interval
-  let perfDataInterval = setInterval(() => {
-    performanceData.getPrimaryData().then(allPerformanceData => {
-      allPerformanceData.MacA = MacA;
+  // // Read Controller Area Network bus mapping
+  // system.getCanBusMapping().then(canMapping => {
+  //   canMapping.MacA = MacA;
+  //   canMapping.action = 'can-mapping';
+  //   if (canMapping.BMSHWRSN !== '') {
+  //     console.log(`${Date.now()} Sending can bus mapping to the server.`);
+  //     ws.send(JSON.stringify(canMapping));
+  //   }
+  // });
 
-      if (allPerformanceData.BMSHWRSN !== '') {
-        allPerformanceData.performanceData.forEach(primaryData => {
-          primaryData.action = 'primary-data';
-          console.log(`${Date.now()} Sending primary data to the server`);
-          ws.send(JSON.stringify(primaryData));
-        });
-      }
-    });
-  }, 5000);
+  // // start sending over data on interval
+  // let perfDataInterval = setInterval(() => {
+  //   performanceData.getPrimaryData().then(allPerformanceData => {
+  //     allPerformanceData.MacA = MacA;
 
-  ws.on('close', function close() {
-    clearInterval(perfDataInterval);
-  });
+  //     if (allPerformanceData.BMSHWRSN !== '') {
+  //       allPerformanceData.performanceData.forEach(primaryData => {
+  //         primaryData.action = 'primary-data';
+  //         console.log(`${Date.now()} Sending primary data to the server`);
+  //         ws.send(JSON.stringify(primaryData));
+  //       });
+  //     }
+  //   });
+  // }, 5000);
+
+  // ws.on('close', function close() {
+  //   clearInterval(perfDataInterval);
+  // });
 });
 
 ws.on('message', function incoming(data) {

@@ -1,19 +1,15 @@
 DROP TABLE IF EXISTS MetaData;
 DROP TABLE IF EXISTS PrimaryData;
 DROP TABLE IF EXISTS SyncLog;
-DROP TABLE IF EXISTS "System";
-
-CREATE TABLE "System" (
-	"Id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	"ConfigVer"	TEXT NOT NULL,
-	"BusinessUnit"	TEXT NOT NULL,
-	"EdgeHWRSN"	TEXT NOT NULL,
-	"EdgeSWRVer"	TEXT NOT NULL,
-	"BMSHWRSN"	TEXT NOT NULL UNIQUE,
-	"BMSSWRVer"	TEXT NOT NULL
-);
+DROP TABLE IF EXISTS CANMapping;
 
 CREATE TABLE "MetaData" (
+    "Cluster"   TEXT NOT NULL,
+	"Key"	TEXT NOT NULL,
+	"Value"	TEXT NOT NULL
+);
+
+CREATE TABLE "CANMapping" (
 	"Key"	TEXT NOT NULL,
 	"Value"	TEXT NOT NULL,
 	"Unit"	TEXT
@@ -45,13 +41,14 @@ CREATE TABLE "PrimaryData" (
 	"TModMaxID"	INTEGER NOT NULL,
 	"HIBattery"	INTEGER NOT NULL,
 	"reserved"	INTEGER NOT NULL,
-	"CreatedAt"	TEXT NOT NULL,
-	"SystemId"	INTEGER NOT NULL,
-	FOREIGN KEY("SystemId") REFERENCES "System"("Id")
+    "Alarms"	INTEGER NOT NULL,
+	"Warnings"	INTEGER NOT NULL,
+	"SystemId"	TEXT NOT NULL,
+    "CreatedAt" TEXT NOT NULL
 );
 
 CREATE TABLE "SyncLog" (
-	"SystemId"	INTEGER NOT NULL,
+	"SystemId"	TEXT NOT NULL,
 	"PrimaryDataId"	INTEGER NOT NULL,
 	"SyncDate"	TEXT,
 	"SyncComment"	TEXT,
@@ -60,8 +57,29 @@ CREATE TABLE "SyncLog" (
 	PRIMARY KEY("SystemId","PrimaryDataId")
 );
 
-INSERT INTO "System"  (ConfigVer, BusinessUnit, EdgeHWRSN, EdgeSWRVer, BMSHWRSN, BMSSWRVer) VALUES ('1.2.0', 'eTransport', 'Ax_12598324', 'Ax_2.5.3',
-'G2_2.4.1', 'G2_3.2.0');
+INSERT INTO MetaData  (Cluster, "Key", "Value") VALUES 
+('identification',	'ConfigVer',	'1.2.0'),
+('identification',	'BusinessUnit', 'eAGV'),
+('identification',	'EdgeHWRSN', 'Ax_12598324'),
+('identification',	'EdgeSWRVer', 'Ax_2.5.3'),
+('identification',	'BMSHWRSN', 'EigerC63B124'),
+('identification',	'BMSSWRVer', 'EigerC63S456'),
+('identification',	'CANMappingVer', 'C63CANV100'),
+('systtem',	'Technology', 'LTO'),
+('systtem',	'ModConfig', '6s4p'),
+('systtem',	'StrConfig', '6S6s4p'),
+('systtem',	'BatConfig', '1P6S6s4p'),
+('systtem',	'NomVoltage', '80V'),
+('systtem',	'NomCapacity', '120Ah'),
+('Cusotmer',	'Cusotmer', 'Generic_1'),
+('Location',	'Location', 'somewhere'),
+('FabricationDate',	'FabricationDate', '01.01.2020'),
+('InstallationDate',	'InstallationDate', '01.01.2020'),
+('ContactMail',	'ContactMail', 'support@leclanche.com'),
+('ContactTel',	'ContactTel', '004121021021021'),
+('CANINFO',	'CANChannel', '1'),
+('CANINFO',	'CANSpeed', '500'),
+('CANINFO',	'CANTimeout', '10');
 
 INSERT INTO PrimaryData  (
     Localtime,
@@ -88,6 +106,8 @@ INSERT INTO PrimaryData  (
 	TModMaxID,
 	HIBattery,
 	reserved,
+    Alarms,
+    Warnings,
 	CreatedAt,
 	SystemId
 ) VALUES (
@@ -115,8 +135,10 @@ INSERT INTO PrimaryData  (
     22,
     23,
     24,
+    25,
+    26,
     date('now'),
-    1    
+    'EigerC63B124'   
 ),
 (
     '14.06.2019 09:09:05',
@@ -143,8 +165,10 @@ INSERT INTO PrimaryData  (
     23,
     24,
     25,
+    26,
+    27,
     date('now'),
-    1    
+    'EigerC63B124'    
 ),
 (
     '15.07.2019 10:09:05',
@@ -171,16 +195,17 @@ INSERT INTO PrimaryData  (
     24,
     25,
     26,
+    27,
+    28,
     date('now'),
-    1    
+    'EigerC63B124'    
 );
 
-INSERT INTO  SyncLog (SystemId, PrimaryDataId) VALUES (1, 1);
-INSERT INTO SyncLog (SystemId, PrimaryDataId) VALUES (1, 2);
-INSERT INTO SyncLog (SystemId, PrimaryDataId) VALUES (1, 3);
+INSERT INTO  SyncLog (SystemId, PrimaryDataId) VALUES ('EigerC63B124', 1);
+INSERT INTO SyncLog (SystemId, PrimaryDataId) VALUES ('EigerC63B124', 2);
+INSERT INTO SyncLog (SystemId, PrimaryDataId) VALUES ('EigerC63B124', 3);
 
-INSERT INTO MetaData (Key, Value, UNIT) VALUES
-('Localtime',	'Edge device local time', NULL),
+INSERT INTO CANMapping (Key, Value, UNIT) VALUES
 ('HB1','Hearbeat 1','%'),
 ('SOC','State of charge','%'),
 ('SOCMax','State of charge Max','%'),
@@ -203,4 +228,6 @@ INSERT INTO MetaData (Key, Value, UNIT) VALUES
 ('TModMinID','Module Temp Min ID','-'),
 ('TModMaxID','Cell Voltage Max ID','-'),
 ('HIBattery','High Resulution Current','1mA'),
-('reserved','Reserveed Parameter','-');
+('reserved','Reserveed Parameter','-'),
+('Alarms',	'Battery Alarms',	'bitFields'),
+('Warnings', 'Battery Warnings', 'bitFields');

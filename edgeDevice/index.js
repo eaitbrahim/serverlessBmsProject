@@ -10,6 +10,7 @@ const ws = new WebSocket(
 
 const nI = os.networkInterfaces();
 let MacA;
+let BMSHWRSN;
 for (let key in nI) {
   if (!nI[key][0].internal) {
     if (nI[key][0].mac === '00:00:00:00:00:00') {
@@ -24,46 +25,42 @@ for (let key in nI) {
 }
 
 ws.on('open', function open() {
-  // Read meta data
+  // Send meta data
   system.getMetaData().then(metaData => {
     metaData.MacA = MacA;
-    metaData.action = 'meta-data';
     if (metaData.BMSHWRSN !== '') {
-      console.log(`${Date.now()} Sending meta data to the server: ${metaData}`);
+      BMSHWRSN = metaData.BMSHWRSN;
+      metaData.action = 'meta-data';
+      console.log(`${Date.now()} Sending meta data to the server.`);
       ws.send(JSON.stringify(metaData));
     }
   });
 
-  // // Read Controller Area Network bus mapping
-  // system.getCanBusMapping().then(canMapping => {
-  //   canMapping.MacA = MacA;
-  //   canMapping.action = 'can-mapping';
-  //   if (canMapping.BMSHWRSN !== '') {
-  //     console.log(`${Date.now()} Sending can bus mapping to the server.`);
-  //     ws.send(JSON.stringify(canMapping));
-  //   }
-  // });
+  // Send CAN Mapping
+  system.getCanMapping().then(canMapping => {
+    canMapping.BMSHWRSN = BMSHWRSN;
+    canMapping.action = 'can-mapping';
+    console.log(`${Date.now()} Sending can mapping to the server.`);
+    ws.send(JSON.stringify(canMapping));
+  });
 
-  // // start sending over data on interval
-  // let perfDataInterval = setInterval(() => {
-  //   performanceData.getPrimaryData().then(allPerformanceData => {
-  //     allPerformanceData.MacA = MacA;
+  // Send primary data on interval
+  let primaryDataInterval = setInterval(() => {
+    system.getPrimaryData(BMSHWRSN).then(primaryData => {
+      primaryData.performanceData.forEach(pd => {
+        pd.BMSHWRSN = primaryData.BMSHWRSN;
+        pd.action = 'primary-data';
+        console.log(`${Date.now()} Sending primary data to the server.`);
+        ws.send(JSON.stringify(pd));
+      });
+    });
+  }, 5000);
 
-  //     if (allPerformanceData.BMSHWRSN !== '') {
-  //       allPerformanceData.performanceData.forEach(primaryData => {
-  //         primaryData.action = 'primary-data';
-  //         console.log(`${Date.now()} Sending primary data to the server`);
-  //         ws.send(JSON.stringify(primaryData));
-  //       });
-  //     }
-  //   });
-  // }, 5000);
-
-  // ws.on('close', function close() {
-  //   clearInterval(perfDataInterval);
-  // });
+  ws.on('close', function close() {
+    clearInterval(primaryDataInterval);
+  });
 });
 
 ws.on('message', function incoming(data) {
-  performanceData.setProcessedData(JSON.parse(data));
+  system.setProcessedData(JSON.parse(data));
 });

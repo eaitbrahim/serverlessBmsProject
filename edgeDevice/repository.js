@@ -5,20 +5,24 @@ class Repository {
 
   getMetaData() {
     console.log('Reading meta data...');
-    return this.dao.all(`SELECT * FROM MetaData`);
+    return this.dao.all(`SELECT * FROM MetaData`, []);
+  }
+
+  getCanMapping() {
+    console.log('Reading meta data...');
+    return this.dao.all(`SELECT * FROM CANMapping`, []);
   }
 
   getNewPrimaryData() {
     console.log('Reading primary data...');
     return this.dao.all(
-      `SELECT * FROM PrimaryData P INNER JOIN SyncLog S ON P.Id = S.PrimaryDataId WHERE S.Processing = 0 AND S.Processed = 0`,
+      `SELECT P.* FROM PrimaryData P INNER JOIN SyncLog S ON P.Id = S.PrimaryDataId WHERE S.Processing = 0 AND S.Processed = 0`,
       []
     );
   }
 
   updateSyncLog(syncLog) {
     console.log('Updating logs...');
-    console.log('syncLog:', syncLog);
     const {
       BMSHWRSN,
       SyncDate,
@@ -28,7 +32,7 @@ class Repository {
       performanceData
     } = syncLog;
     return this.dao.run(
-      `UPDATE SyncLog SET SyncDate=?, SyncComment=?, Processing=?, Processed=? WHERE SystemId = (SELECT Id From System WHERE BMSHWRSN=?) AND PrimaryDataId IN (${performanceData.join(
+      `UPDATE SyncLog SET SyncDate=?, SyncComment=?, Processing=?, Processed=? WHERE SystemId = ? AND PrimaryDataId IN (${performanceData.join(
         ','
       )})`,
       [SyncDate, SyncComment, Processing, Processed, BMSHWRSN]
@@ -37,7 +41,10 @@ class Repository {
 
   deleteOldSyncLog(fromDate) {
     console.log('Deleting logs...');
-    return this.dao.run(`DELETE FROM SyncLog WHERE SyncDate <= ?`, [fromDate]);
+    return this.dao.run(
+      `DELETE FROM SyncLog WHERE SyncDate <= ? AND Processing = 1 AND Processed = 1`,
+      [fromDate]
+    );
   }
 
   deleteOldPrimaryDate(fromDate) {

@@ -9,7 +9,6 @@ const getMetaData = () => {
     repo
       .getMetaData()
       .then(metaData => {
-        console.log('fetched meta data: ', metaData);
         let data = { BMSHWRSN: '', Cluster: {} };
         metaData.forEach(md => {
           if (!data.Cluster[md.Cluster]) {
@@ -20,7 +19,6 @@ const getMetaData = () => {
             data.BMSHWRSN = md.Value;
           }
         });
-        console.log('constructed data: ', data);
         resolve(data);
       })
       .catch(err => {
@@ -30,12 +28,30 @@ const getMetaData = () => {
   });
 };
 
-const getPrimaryData = () => {
+const getCanMapping = () => {
   return new Promise((resolve, reject) => {
+    repo
+      .getCanMapping()
+      .then(canMapping => {
+        let data = { BMSHWRSN: '', CanMapping: [] };
+        canMapping.forEach(cm => {
+          data.CanMapping.push({ Key: cm.Key, Value: cm.Value, Unit: cm.Unit });
+        });
+        resolve(data);
+      })
+      .catch(err => {
+        console.log(`Error: ${JSON.stringify(err)}`);
+        reject(err);
+      });
+  });
+};
+
+const getPrimaryData = BMSHWRSN => {
+  return new Promise((resolve, reject) => {
+    let data = { BMSHWRSN, performanceData: [] };
     repo
       .getNewPrimaryData()
       .then(newPrimaryData => {
-        data.performanceData = [];
         newPrimaryData.forEach(d => {
           data.performanceData.push(d);
         });
@@ -51,13 +67,14 @@ const getPrimaryData = () => {
             Processed: 0,
             performanceData: performanceData.map(d => d.Id)
           });
+
+          resolve(data);
         }
       })
       .catch(err => {
         console.log(`Error: ${JSON.stringify(err)}`);
         reject(err);
       });
-    resolve(data);
   });
 };
 
@@ -74,4 +91,9 @@ const setProcessedData = data => {
   });
 };
 
-module.exports = { getMetaData, getPrimaryData, setProcessedData };
+module.exports = {
+  getMetaData,
+  getCanMapping,
+  getPrimaryData,
+  setProcessedData
+};

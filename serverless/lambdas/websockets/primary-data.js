@@ -22,7 +22,7 @@ exports.handler = async event => {
     const body = JSON.parse(event.body);
     const data = {
       BMSHWRSN: System,
-      ReceivedDateTime: Date.now(),
+      ReceivedDateTime: String(Date.now()),
       ...body
     };
 

@@ -16,7 +16,29 @@ class Repository {
   getNewPrimaryData() {
     console.log('Reading primary data...');
     return this.dao.all(
-      `SELECT P.* FROM PrimaryData P INNER JOIN SyncLog S ON P.Id = S.PrimaryDataId WHERE S.Processing = 0 AND S.Processed = 0`,
+      `SELECT * FROM PrimaryData  WHERE Id NOT IN (SELECT PrimaryDataId FROM SyncLog)`,
+      []
+    );
+  }
+
+  createSyncLog(syncLog) {
+    console.log('Creating logs...');
+    const {
+      BMSHWRSN,
+      SyncDate,
+      SyncComment,
+      Processing,
+      Processed,
+      performanceData
+    } = syncLog;
+    const dataToInsert = performanceData.map(p => {
+      return `('${BMSHWRSN}', ${p}, ${SyncDate}, '${SyncComment}', ${Processing}, ${Processed})`;
+    });
+
+    return this.dao.run(
+      `INSERT INTO SyncLog (SystemId, PrimaryDataId, SyncDate, SyncComment, Processing, Processed) VALUES ${dataToInsert.join(
+        ','
+      )}`,
       []
     );
   }

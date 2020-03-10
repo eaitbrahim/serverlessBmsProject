@@ -48,10 +48,11 @@ ws.on('open', function open() {
   let primaryDataInterval = setInterval(() => {
     system.getPrimaryData(BMSHWRSN).then(primaryData => {
       primaryData.performanceData.forEach(pd => {
-        pd.BMSHWRSN = primaryData.BMSHWRSN;
-        pd.action = 'primary-data';
-        console.log(`${Date.now()} Sending primary data to the server.`);
-        ws.send(JSON.stringify(pd));
+        if (pd.BMSHWRSN !== '') {
+          pd.action = 'primary-data';
+          console.log(`${Date.now()} Sending primary data to the server.`);
+          ws.send(JSON.stringify(pd));
+        }
       });
     });
   }, 5000);

@@ -59,7 +59,7 @@ const getPrimaryData = BMSHWRSN => {
       })
       .then(({ BMSHWRSN, performanceData }) => {
         if (performanceData.length > 0) {
-          repo.updateSyncLog({
+          repo.createSyncLog({
             BMSHWRSN,
             SyncDate: Date.now(),
             SyncComment: 'Processing',

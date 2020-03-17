@@ -38,6 +38,7 @@ exports.handler = async event => {
 
     return Response._200({ message: 'New primary data' });
   } catch (error) {
+    console.log('Error: ', error);
     return Responses._400({ message: 'primary data could not be received' });
   }
 };

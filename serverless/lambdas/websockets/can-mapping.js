@@ -28,6 +28,7 @@ exports.handler = async event => {
 
     return Responses._200({ message: `disconnected` });
   } catch (error) {
+    console.log('Error: ', error);
     return Responses._400({ message: 'disconnection could not be updated' });
   }
 };

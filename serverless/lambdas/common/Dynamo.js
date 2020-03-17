@@ -7,9 +7,7 @@ const Dynamo = {
     const data = await documentClient.get(params).promise();
 
     if (!data || !data.Item) {
-      throw Error(
-        `There was an error fetching the data for ID of ${Id} from ${TableName}`
-      );
+      throw Error(`There was an error fetching the data from ${TableName}`);
     }
 
     return data.Item;

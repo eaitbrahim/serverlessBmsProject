@@ -1,157 +1,179 @@
-import React, { Component } from "react";
-import { ListGroup, ListGroupItem } from "reactstrap";
-import PropTypes from "prop-types";
-import classNames from "classnames";
-import { AppSwitch } from "@coreui/react";
-
-const propTypes = {
-  children: PropTypes.node
-};
+import React, { Component, Suspense } from 'react';
+import {
+  Nav,
+  NavItem,
+  NavLink,
+  Progress,
+  TabContent,
+  TabPane,
+  ListGroup,
+  ListGroupItem,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
+} from 'reactstrap';
+import classNames from 'classnames';
+import { AppSwitch } from '@coreui/react';
 
 const defaultProps = {};
 
 class DefaultAside extends Component {
   constructor(props) {
     super(props);
+    this.toggle = this.toggle.bind(this);
+    this.state = {
+      activeTab: '1',
+      dropdownOpen: false
+    };
   }
 
-  render() {
-    // eslint-disable-next-line
-    const { children, ...attributes } = this.props;
+  loading = () => (
+    <div className='animated fadeIn pt-1 text-center'>Loading...</div>
+  );
 
+  constructSystems = () => {
+    return this.props.systems.map(s => {
+      return (
+        <DropdownItem key={s} onClick={e => this.props.onChangeSystem(s)}>
+          {s}
+        </DropdownItem>
+      );
+    });
+  };
+  constructMetaData = metaData => {
+    return metaData.map(md => {
+      return (
+        <div key={md.Key}>
+          {md.Key}: <small className='text-muted mr-3'>{md.Value}</small>
+        </div>
+      );
+    });
+  };
+
+  toggle(tab) {
+    if (this.state.activeTab !== tab) {
+      this.setState({
+        activeTab: tab
+      });
+    }
+  }
+
+  toggleDropdown = () =>
+    this.setState({ dropdownOpen: !this.state.dropdownOpen });
+
+  render() {
     return (
       <React.Fragment>
-        <ListGroup className="list-group-accent" tag={"div"}>
-          <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
-            List of Systems
-          </ListGroupItem>
-          <ListGroupItem
-            action
-            tag="a"
-            className="list-group-item-accent-warning list-group-item-divider"
-          >
-            <div>List of batteries to select</div>
-          </ListGroupItem>
+        <Nav tabs>
+          <NavItem>
+            <NavLink
+              className={classNames({ active: this.state.activeTab === '1' })}
+              onClick={() => {
+                this.toggle('1');
+              }}
+            >
+              <i className='icon-settings'></i>
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classNames({ active: this.state.activeTab === '2' })}
+              onClick={() => {
+                this.toggle('2');
+              }}
+            >
+              <i className='icon-list'></i>
+            </NavLink>
+          </NavItem>
+        </Nav>
+        <TabContent activeTab={this.state.activeTab}>
+          <TabPane tabId='1'>
+            <ListGroup className='list-group-accent' tag={'div'}>
+              <ListGroupItem className='list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small'>
+                List of Systems
+              </ListGroupItem>
+              <ListGroupItem
+                action
+                tag='a'
+                className='list-group-item-accent-warning list-group-item-divider'
+              >
+                <Suspense fallback={this.loading()}>
+                  <Dropdown
+                    isOpen={this.state.dropdownOpen}
+                    toggle={this.toggleDropdown}
+                  >
+                    <DropdownToggle caret>Systems</DropdownToggle>
+                    <DropdownMenu>{this.constructSystems()}</DropdownMenu>
+                  </Dropdown>
+                </Suspense>
+              </ListGroupItem>
 
-          <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
-            Identification
-          </ListGroupItem>
-          <ListGroupItem
-            action
-            tag="a"
-            className="list-group-item-accent-danger list-group-item-divider"
-          >
-            <div>
-              ConfigVer: <small className="text-muted mr-3">1.2.0</small>
-            </div>
-            <div>
-              BusinessUnit: <small className="text-muted mr-3">eAGV</small>
-            </div>
-            <div>
-              EdgeHWRSN:
-              <small className="text-muted mr-3">Ax_12598324</small>
-            </div>
-            <div>
-              EdgeSWRVer: <small className="text-muted mr-3">Ax_2.5.3</small>
-            </div>
-            <div>
-              BMSHWRSN: <small className="text-muted mr-3">EigerC63B124</small>
-            </div>
-            <div>
-              BMSSWRVer: <small className="text-muted mr-3">EigerC63S456</small>
-            </div>
-            <div>
-              CANMappingVer:{" "}
-              <small className="text-muted mr-3">C63CANV100</small>
-            </div>
-          </ListGroupItem>
-          <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
-            System Description
-          </ListGroupItem>
-          <ListGroupItem
-            action
-            tag="a"
-            href="#"
-            className="list-group-item-accent-primary list-group-item-divider"
-          >
-            <div>
-              Technology: <small className="text-muted mr-3">LTO</small>
-            </div>
-            <div>
-              ModConfig: <small className="text-muted mr-3">6s4p</small>
-            </div>
-            <div>
-              StrConfig: <small className="text-muted mr-3">6S6s4p</small>
-            </div>
-            <div>
-              BatConfig: <small className="text-muted mr-3">1P6S6s4p</small>
-            </div>
-            <div>
-              NomVoltage: <small className="text-muted mr-3">80V</small>
-            </div>
-            <div>
-              NomCapacity: <small className="text-muted mr-3">120Ah</small>
-            </div>
-          </ListGroupItem>
-          <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
-            Product Info
-          </ListGroupItem>
-          <ListGroupItem
-            action
-            tag="a"
-            href="#"
-            className="list-group-item-accent-success list-group-item-divider"
-          >
-            <div>
-              Cusotmer: <small className="text-muted mr-3">Generic_1</small>
-            </div>
-            <div>
-              Location: <small className="text-muted mr-3">somewhere</small>
-            </div>
-            <div>
-              FabricationDate:
-              <small className="text-muted mr-3">01.01.2020</small>
-            </div>
-            <div>
-              InstallationDate:
-              <small className="text-muted mr-3">01.01.2020</small>
-            </div>
-            <div>
-              ContactMail:
-              <small className="text-muted mr-3">support@leclanche.com</small>
-            </div>
-            <div>
-              ContactTel:
-              <small className="text-muted mr-3">004121021021021</small>
-            </div>
-          </ListGroupItem>
-          <ListGroupItem className="list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small">
-            CAN Info
-          </ListGroupItem>
-          <ListGroupItem
-            action
-            tag="a"
-            href="#"
-            className="list-group-item-accent-info list-group-item-divider"
-          >
-            <div>
-              CANChannel: <small className="text-muted mr-3">1</small>
-            </div>
-            <div>
-              CANSpeed: <small className="text-muted mr-3">500</small>
-            </div>
-            <div>
-              CANTimeout:
-              <small className="text-muted mr-3">10</small>
-            </div>
-          </ListGroupItem>
-        </ListGroup>
+              <ListGroupItem className='list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small'>
+                Identification
+              </ListGroupItem>
+              <ListGroupItem
+                action
+                tag='a'
+                className='list-group-item-accent-danger list-group-item-divider'
+              >
+                <Suspense fallback={this.loading()}>
+                  {this.constructMetaData(this.props.metaData.identification)}
+                </Suspense>
+              </ListGroupItem>
+              <ListGroupItem className='list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small'>
+                System Description
+              </ListGroupItem>
+              <ListGroupItem
+                action
+                tag='a'
+                href='#'
+                className='list-group-item-accent-primary list-group-item-divider'
+              >
+                <Suspense fallback={this.loading()}>
+                  {this.constructMetaData(
+                    this.props.metaData.systemDescription
+                  )}
+                </Suspense>
+              </ListGroupItem>
+            </ListGroup>
+          </TabPane>
+          <TabPane tabId='2'>
+            <ListGroup className='list-group-accent' tag={'div'}>
+              <ListGroupItem className='list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small'>
+                Product Info
+              </ListGroupItem>
+              <ListGroupItem
+                action
+                tag='a'
+                href='#'
+                className='list-group-item-accent-success list-group-item-divider'
+              >
+                <Suspense fallback={this.loading()}>
+                  {this.constructMetaData(this.props.metaData.productInfo)}
+                </Suspense>
+              </ListGroupItem>
+              <ListGroupItem className='list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small'>
+                CAN Info
+              </ListGroupItem>
+              <ListGroupItem
+                action
+                tag='a'
+                href='#'
+                className='list-group-item-accent-info list-group-item-divider'
+              >
+                <Suspense fallback={this.loading()}>
+                  {this.constructMetaData(this.props.metaData.canInfo)}
+                </Suspense>
+              </ListGroupItem>
+            </ListGroup>
+          </TabPane>
+        </TabContent>
       </React.Fragment>
     );
   }
 }
 
-DefaultAside.propTypes = propTypes;
 DefaultAside.defaultProps = defaultProps;
 
 export default DefaultAside;

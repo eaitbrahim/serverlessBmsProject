@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Link, NavLink } from "react-router-dom";
+import React, { Component } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import {
   Badge,
   UncontrolledDropdown,
@@ -8,87 +8,78 @@ import {
   DropdownToggle,
   Nav,
   NavItem
-} from "reactstrap";
-import PropTypes from "prop-types";
-
+} from 'reactstrap';
 import {
   AppAsideToggler,
   AppNavbarBrand,
   AppSidebarToggler
-} from "@coreui/react";
-import logo from "../../assets/img/brand/logo.png";
-import sign from "../../assets/img/brand/sign.png";
-
-const propTypes = {
-  children: PropTypes.node
-};
+} from '@coreui/react';
+import logo from '../../assets/img/brand/logo.png';
+import sign from '../../assets/img/brand/sign.png';
 
 const defaultProps = {};
 
 class DefaultHeader extends Component {
   render() {
-    // eslint-disable-next-line
-    const { children, ...attributes } = this.props;
-
     return (
       <React.Fragment>
         <AppNavbarBrand
-          full={{ src: logo, width: 89, height: 25, alt: "Leclanche Logo" }}
+          full={{ src: logo, width: 89, height: 25, alt: 'Leclanche Logo' }}
           minimized={{
             src: sign,
             width: 30,
             height: 30,
-            alt: "Leclanche Logo"
+            alt: 'Leclanche Logo'
           }}
         />
-        <Nav className="d-md-down-none" navbar>
-          <NavItem className="px-3">
-            <NavLink to="/dashboard" className="nav-link">
+        <Nav className='d-md-down-none' navbar>
+          <NavItem className='px-3'>
+            <NavLink to='/dashboard' className='nav-link'>
               Dashboard
             </NavLink>
           </NavItem>
-          <NavItem className="px-3">
-            <Link to="/users" className="nav-link">
+          <NavItem className='px-3'>
+            <Link to='/users' className='nav-link'>
               Users
             </Link>
           </NavItem>
-          <NavItem className="px-3">
-            <NavLink to="#" className="nav-link">
+          <NavItem className='px-3'>
+            <NavLink to='#' className='nav-link'>
               Settings
             </NavLink>
           </NavItem>
         </Nav>
-        <Nav className="ml-auto" navbar>
-          <NavItem className="d-md-down-none">
-            <NavLink to="#" className="nav-link">
-              <i className="icon-bell"></i>
-              <Badge pill color="danger">
+        <Nav className='ml-auto' navbar>
+          <NavItem className='d-md-down-none'>
+            <NavLink to='#' className='nav-link'>
+              <i className='icon-bell'></i>
+              <Badge pill color='danger'>
                 5
               </Badge>
             </NavLink>
           </NavItem>
-          <UncontrolledDropdown nav direction="down">
+          <UncontrolledDropdown nav direction='down'>
             <DropdownToggle nav>
               <img
-                src={"../../assets/img/avatars/6.jpg"}
-                className="img-avatar"
-                alt="admin@bootstrapmaster.com"
+                src={'../../assets/img/avatars/6.jpg'}
+                className='img-avatar'
+                alt='admin@bootstrapmaster.com'
               />
               Lola Huber
             </DropdownToggle>
             <DropdownMenu right>
-              <DropdownItem header tag="div" className="text-center">
+              <DropdownItem header tag='div' className='text-center'>
                 <strong>Settings</strong>
               </DropdownItem>
               <DropdownItem>
-                <i className="fa fa-user"></i> Profile
+                <i className='fa fa-user'></i> Profile
               </DropdownItem>
               <DropdownItem>
-                <i className="fa fa-wrench"></i> Settings
+                <i className='fa fa-wrench'></i> Settings
               </DropdownItem>
               <DropdownItem divider />
               <DropdownItem onClick={e => this.props.onLogout(e)}>
-                <i className="fa fa-lock"></i> Logout
+                <i className='fa fa-lock'></i> Logout
               </DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown>
@@ -99,7 +90,6 @@ class DefaultHeader extends Component {
   }
 }
 
-DefaultHeader.propTypes = propTypes;
 DefaultHeader.defaultProps = defaultProps;
 
 export default DefaultHeader;

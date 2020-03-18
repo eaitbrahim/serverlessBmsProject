@@ -7,10 +7,24 @@ const Dynamo = {
     const data = await documentClient.get(params).promise();
 
     if (!data || !data.Item) {
-      throw Error(`There was an error fetching the data from ${TableName}`);
+      throw Error(
+        `There was an error fetching the data from ${params.TableName}`
+      );
     }
 
     return data.Item;
+  },
+
+  async getAll(params) {
+    const data = await documentClient.scan(params).promise();
+
+    if (!data || !data.Items) {
+      throw Error(
+        `There was an error fetching the data from ${params.TableName}`
+      );
+    }
+
+    return data.Items;
   },
 
   async write(data, TableName) {

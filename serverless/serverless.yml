@@ -15,6 +15,8 @@ provider:
       Action:
         - dynamodb:*
       Resource: '*'
+  apiKeys:
+    - BmsApiKey
 
 custom:
   tableNameConnection: Connections
@@ -25,7 +27,6 @@ custom:
   s3Sync:
     - bucketName: ${self:custom.bucketName}
       localDir: bms-dashboard/build/
-
 
 functions:
   websocket-connect:
@@ -62,9 +63,18 @@ functions:
     handler: lambdas/endpoints/getMetaData.handler
     events:
       - http:
-          path: get-meta-data
+          path: get-meta-data/{BMSHWRSN}
           method: GET
           cors: true
+          private: true
+  http-get-systems:
+    handler: lambdas/endpoints/getSystems.handler
+    events:
+      - http:
+          path: get-systems
+          method: GET
+          cors: true
+          private: true
 
 resources:
   Resources:

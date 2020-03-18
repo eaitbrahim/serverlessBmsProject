@@ -1,7 +1,8 @@
-import React, { Component, Suspense } from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
-import * as router from "react-router-dom";
-import { Container } from "reactstrap";
+import React, { Component, Suspense } from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import * as router from 'react-router-dom';
+import { Container } from 'reactstrap';
+import agent from '../../api/agent';
 
 import {
   AppAside,
@@ -9,42 +10,143 @@ import {
   AppHeader,
   AppBreadcrumb2 as AppBreadcrumb,
   AppSidebarNav2 as AppSidebarNav
-} from "@coreui/react";
+} from '@coreui/react';
 // sidebar nav config
-import navigation from "../../_nav";
+import navigation from '../../_nav';
 // routes config
-import routes from "../../routes";
+import routes from '../../routes';
 
-const DefaultAside = React.lazy(() => import("./DefaultAside"));
-const DefaultFooter = React.lazy(() => import("./DefaultFooter"));
-const DefaultHeader = React.lazy(() => import("./DefaultHeader"));
+const DefaultAside = React.lazy(() => import('./DefaultAside'));
+const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
+const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isSystemOnline: false,
+      systemId: '',
+      systems: [],
+      metaData: {
+        identification: [],
+        canInfo: [],
+        systemDescription: [],
+        productInfo: []
+      }
+    };
+  }
+
   loading = () => (
-    <div className="animated fadeIn pt-1 text-center">Loading...</div>
+    <div className='animated fadeIn pt-1 text-center'>Loading...</div>
   );
 
   signOut(e) {
     e.preventDefault();
-    this.props.history.push("/login");
+    this.props.history.push('/login');
+  }
+
+  changeSystem(s) {
+    this.setState({
+      metaData: {
+        identification: [],
+        canInfo: [],
+        systemDescription: [],
+        productInfo: []
+      }
+    });
+    this.getMetaDataById(s);
+  }
+
+  getMetaDataById = BMSHWRSN => {
+    agent.fetchData.metaDataById(BMSHWRSN).then(response => {
+      const { IsOnline, BMSHWRSN } = response.metaData;
+      const {
+        identification,
+        CANINFO,
+        systtem,
+        Cusotmer,
+        Location,
+        FabricationDate,
+        InstallationDate,
+        ContactMail,
+        ContactTel
+      } = response.metaData.Cluster;
+      const productInfo = [];
+      Cusotmer.forEach(c => productInfo.push(c));
+      Location.forEach(l => productInfo.push(l));
+      FabricationDate.forEach(fd => productInfo.push(fd));
+      InstallationDate.forEach(id => productInfo.push(id));
+      ContactMail.forEach(cm => productInfo.push(cm));
+      ContactTel.forEach(ct => productInfo.push(ct));
+      this.setState({
+        isSystemOnline: IsOnline,
+        systemId: BMSHWRSN,
+        metaData: {
+          identification,
+          canInfo: CANINFO,
+          systemDescription: systtem,
+          productInfo
+        }
+      });
+    });
+  };
+
+  getListOfSystems = () => {
+    agent.fetchData.listOfSystems().then(({ systems }) => {
+      this.setState({ systems });
+      if (this.state.systems.length > 0) {
+        this.getMetaDataById(this.state.systems[0]);
+      }
+    });
+  };
+
+  componentDidMount() {
+    this.getListOfSystems();
   }
 
   render() {
     return (
-      <div className="app">
+      <div className='app'>
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} />
           </Suspense>
         </AppHeader>
-        <div className="app-body">
-          <main className="main">
+        <div className='app-body'>
+          <main className='main'>
             <AppBreadcrumb appRoutes={routes} router={router} />
+            <Container fluid>
+              <Suspense fallback={this.loading()}>
+                <Switch>
+                  {routes.map((route, idx) => {
+                    return route.component ? (
+                      <Route
+                        key={idx}
+                        path={route.path}
+                        exact={route.exact}
+                        name={route.name}
+                        render={() => (
+                          <route.component
+                            isSystemOnline={this.state.isSystemOnline}
+                            systemId={this.state.systemId}
+                          />
+                        )}
+                      />
+                    ) : null;
+                  })}
+                  <Redirect from='/' to='/dashboard' />
+                </Switch>
+              </Suspense>
+            </Container>
           </main>
 
-          <AppAside fixed fixed display="lg">
+          <AppAside fixed fixed display='lg'>
             <Suspense fallback={this.loading()}>
-              <DefaultAside />
+              <DefaultAside
+                systems={this.state.systems}
+                metaData={this.state.metaData}
+                onChangeSystem={e => this.changeSystem(e)}
+              />
             </Suspense>
           </AppAside>
         </div>

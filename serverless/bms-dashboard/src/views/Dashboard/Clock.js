@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Card, CardBody } from 'reactstrap';
 
-class CurrentTime extends Component {
+class Clock extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -26,7 +26,7 @@ class CurrentTime extends Component {
     return (
       <Card className='text-white bg-warning'>
         <CardBody>
-          <div className='text-value'>
+          <div className='small text-value'>
             Current date & time {this.state.time}
           </div>
         </CardBody>
@@ -35,4 +35,4 @@ class CurrentTime extends Component {
   }
 }
 
-export default CurrentTime;
+export default Clock;

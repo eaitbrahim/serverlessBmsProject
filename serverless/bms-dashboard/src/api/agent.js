@@ -15,7 +15,9 @@ const requests = {
 
 const fetchData = {
   listOfSystems: () => requests.get('/get-systems'),
-  metaDataById: BMSHWRSN => requests.get(`/get-meta-data/${BMSHWRSN}`)
+  metaDataById: BMSHWRSN => requests.get(`/get-meta-data/${BMSHWRSN}`),
+  lastPrimaryDataById: BMSHWRSN =>
+    requests.get(`/get-last-primary-data/${BMSHWRSN}`)
 };
 
 export default {

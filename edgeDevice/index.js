@@ -2,7 +2,6 @@ const os = require('os');
 const WebSocket = require('ws');
 
 const system = require('./system');
-//const syncLog = require('./syncLog');
 
 const ws = new WebSocket(
   'wss://5xcuq4dlm1.execute-api.eu-central-1.amazonaws.com/dev'

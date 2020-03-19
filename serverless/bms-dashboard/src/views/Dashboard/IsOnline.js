@@ -9,7 +9,7 @@ const IsOnline = ({ isSystemOnline, systemId }) => {
       }
     >
       <CardBody>
-        <div className='text-value'>
+        <div className='small text-value'>
           <strong>{systemId}</strong> is
           {isSystemOnline ? ' On Line' : ' Off Line'}
         </div>

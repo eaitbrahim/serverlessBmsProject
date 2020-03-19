@@ -2,8 +2,6 @@ import React, { Component, Suspense } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import * as router from 'react-router-dom';
 import { Container } from 'reactstrap';
-import agent from '../../api/agent';
-
 import {
   AppAside,
   AppFooter,
@@ -11,10 +9,9 @@ import {
   AppBreadcrumb2 as AppBreadcrumb,
   AppSidebarNav2 as AppSidebarNav
 } from '@coreui/react';
-// sidebar nav config
-import navigation from '../../_nav';
-// routes config
+
 import routes from '../../routes';
+import agent from '../../api/agent';
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -32,7 +29,8 @@ class DefaultLayout extends Component {
         canInfo: [],
         systemDescription: [],
         productInfo: []
-      }
+      },
+      primaryData: {}
     };
   }
 
@@ -52,14 +50,18 @@ class DefaultLayout extends Component {
         canInfo: [],
         systemDescription: [],
         productInfo: []
-      }
+      },
+      primaryData: {}
     });
-    this.getMetaDataById(s);
+    this.getDataById(s);
   }
 
-  getMetaDataById = BMSHWRSN => {
-    agent.fetchData.metaDataById(BMSHWRSN).then(response => {
-      const { IsOnline, BMSHWRSN } = response.metaData;
+  getDataById = systemId => {
+    const metaDataPromise = agent.fetchData.metaDataById(systemId);
+    const primaryDataPromise = agent.fetchData.lastPrimaryDataById(systemId);
+
+    Promise.all([metaDataPromise, primaryDataPromise]).then(responses => {
+      const { IsOnline, BMSHWRSN } = responses[0].metaData;
       const {
         identification,
         CANINFO,
@@ -70,7 +72,7 @@ class DefaultLayout extends Component {
         InstallationDate,
         ContactMail,
         ContactTel
-      } = response.metaData.Cluster;
+      } = responses[0].metaData.Cluster;
       const productInfo = [];
       Cusotmer.forEach(c => productInfo.push(c));
       Location.forEach(l => productInfo.push(l));
@@ -78,6 +80,7 @@ class DefaultLayout extends Component {
       InstallationDate.forEach(id => productInfo.push(id));
       ContactMail.forEach(cm => productInfo.push(cm));
       ContactTel.forEach(ct => productInfo.push(ct));
+
       this.setState({
         isSystemOnline: IsOnline,
         systemId: BMSHWRSN,
@@ -86,7 +89,8 @@ class DefaultLayout extends Component {
           canInfo: CANINFO,
           systemDescription: systtem,
           productInfo
-        }
+        },
+        primaryData: { ...responses[1].primaryData }
       });
     });
   };
@@ -95,7 +99,7 @@ class DefaultLayout extends Component {
     agent.fetchData.listOfSystems().then(({ systems }) => {
       this.setState({ systems });
       if (this.state.systems.length > 0) {
-        this.getMetaDataById(this.state.systems[0]);
+        this.getDataById(this.state.systems[0]);
       }
     });
   };
@@ -129,6 +133,7 @@ class DefaultLayout extends Component {
                           <route.component
                             isSystemOnline={this.state.isSystemOnline}
                             systemId={this.state.systemId}
+                            primaryData={this.state.primaryData}
                           />
                         )}
                       />

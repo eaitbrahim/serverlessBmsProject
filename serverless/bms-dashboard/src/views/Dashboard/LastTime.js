@@ -1,11 +1,13 @@
 import React from 'react';
 import { Card, CardBody } from 'reactstrap';
 
-const LastTime = () => {
+const LastTime = props => {
   return (
     <Card className='text-white bg-primary'>
       <CardBody>
-        <div className='text-value'>Last primary data received at {}</div>
+        <div className='small text-value'>
+          Last primary data received at {props.lastDateTime}
+        </div>
       </CardBody>
     </Card>
   );

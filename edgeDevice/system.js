@@ -86,7 +86,7 @@ const setProcessedData = data => {
       SyncComment: 'Processed',
       Processing: 1,
       Processed: 1,
-      performanceData: [data.Id]
+      performanceData: [parseInt(data.Id)]
     });
   });
 };

@@ -27,6 +27,18 @@ const Dynamo = {
     return data.Items;
   },
 
+  async query(params) {
+    const data = await documentClient.query(params).promise();
+    console.log('data:', data);
+    if (!data || !data.Items) {
+      throw Error(
+        `There was an error fetching the data from ${params.TableName}`
+      );
+    }
+
+    return data.Items;
+  },
+
   async write(data, TableName) {
     if (!data.BMSHWRSN) {
       throw Error('no BMSHWRSN on the data');

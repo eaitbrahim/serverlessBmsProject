@@ -33,7 +33,7 @@ exports.handler = async event => {
       DomainName,
       Stage,
       ConnectionId,
-      Message: { BMSHWRSN: data.BMSHWRSN, Id: parseInt(data.Id) }
+      Message: data
     });
 
     return Response._200({ message: 'New primary data' });

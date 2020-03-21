@@ -1,5 +1,6 @@
 const Responses = require('../common/API_Responses');
 const Dynamo = require('../common/Dynamo');
+const Dashboard = require('./dashboard');
 
 exports.handler = async event => {
   console.log('event', event);
@@ -38,6 +39,9 @@ exports.handler = async event => {
     };
 
     await Dynamo.write(data, process.env.tableNameMetaData);
+
+    // Send data to Dashboards
+    await Dashboard.sendMessages(data);
 
     return Responses._200({ message: `disconnected` });
   } catch (error) {

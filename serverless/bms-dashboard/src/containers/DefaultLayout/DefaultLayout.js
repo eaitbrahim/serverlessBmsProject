@@ -37,7 +37,16 @@ class DefaultLayout extends Component {
   socketConnection = null;
 
   dashboardMessageHandler = message => {
-    this.setState(prevState => ({ primaryData: { ...message } }));
+    if ('SOC' in message && 'SOCMax' in message && 'SOCMin' in message) {
+      this.setState(prevState => ({
+        primaryData: { ...message },
+        isSystemOnline: message.IsOnline
+      }));
+    } else {
+      this.setState(prevState => ({
+        isSystemOnline: message.IsOnline
+      }));
+    }
   };
 
   loading = () => (
@@ -75,7 +84,7 @@ class DefaultLayout extends Component {
         ProductInfo
       } = responses[0].metaData.Cluster;
 
-      this.setState({
+      this.setState(prevState => ({
         isSystemOnline: IsOnline,
         systemId: BMSHWRSN,
         metaData: {
@@ -85,7 +94,7 @@ class DefaultLayout extends Component {
           productInfo: ProductInfo
         },
         primaryData: { ...responses[1].primaryData }
-      });
+      }));
 
       getWSService().addMessageListener(
         this.state.systemId,

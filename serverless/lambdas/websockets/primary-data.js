@@ -1,6 +1,7 @@
 const Responses = require('../common/API_Responses');
 const Dynamo = require('../common/Dynamo');
 const WebSocket = require('../common/websocketMessage');
+const Dashboard = require('./dashboard');
 
 exports.handler = async event => {
   console.log('event', event);
@@ -36,28 +37,8 @@ exports.handler = async event => {
       Message: data
     });
 
-    // Send data to Dashboard
-    const paramsForConnections = {
-      TableName: process.env.tableNameConnection,
-      IndexName: process.env.indexNameConnection,
-      KeyConditionExpression: '#System = :System',
-      ExpressionAttributeNames: { '#System': 'System' },
-      ExpressionAttributeValues: {
-        ':System': 'Dashboard'
-      }
-    };
-
-    const connectedDashboards = await Dynamo.query(paramsForConnections);
-    for (const { DomainName, Stage, ConnectionId } of connectedDashboards) {
-      await WebSocket.send({
-        DomainName,
-        Stage,
-        ConnectionId,
-        Message: data
-      });
-    }
-
-    console.log('Data sent to all connected dashboars.');
+    // Send data to Dashboards
+    await Dashboard.sendMessages(data, true);
 
     return Responses._200({ message: 'New primary data' });
   } catch (error) {

@@ -6,7 +6,8 @@ const LastTime = props => {
     <Card className='text-white bg-primary'>
       <CardBody>
         <div className='small text-value'>
-          {props.lastDateTime !== ''
+          {typeof props.lastDateTime !== 'undefined' &&
+          props.lastDateTime !== ''
             ? `Last sample received at ${props.lastDateTime}`
             : `No primary data received so far!`}
         </div>

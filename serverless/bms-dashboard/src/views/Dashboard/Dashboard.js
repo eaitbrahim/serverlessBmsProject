@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react';
 import { Col, Row } from 'reactstrap';
-//import moment from 'moment';
 
 import IsOnline from './IsOnline';
 import LastTime from './LastTime';
@@ -10,20 +9,6 @@ import SocSoh from './SocSoh';
 const loading = () => (
   <div className='animated fadeIn pt-1 text-center'>Loading...</div>
 );
-
-const lastTime = primaryData => {
-  if (
-    Object.keys(primaryData).length === 0 &&
-    primaryData.constructor === Object
-  ) {
-    return '';
-  }
-  //return moment(new Date(primaryData.ReceivedDateTime)).format('HH:mm:ss');
-  return primaryData.CreatedAt.substring(0, primaryData.CreatedAt.indexOf('.'))
-    .replace('T', ', ')
-    .replace(':', '/')
-    .replace(':', '/');
-};
 
 const Dashboard = props => {
   return (
@@ -40,7 +25,11 @@ const Dashboard = props => {
 
         <Col xs='12' sm='6' lg='5'>
           <Suspense fallback={loading()}>
-            <LastTime lastDateTime={lastTime(props.primaryData)} />
+            <LastTime
+              lastDateTime={
+                props.primaryData ? props.primaryData.Localtime : ''
+              }
+            />
           </Suspense>
         </Col>
 

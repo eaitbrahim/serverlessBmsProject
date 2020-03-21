@@ -38,9 +38,8 @@ class WebSocketService {
   };
 
   onMessage = data => {
-    console.log('message received: ', data);
     if (data) {
-      const message = JSON.parse(data);
+      const message = JSON.parse(data.data);
       const typeListener = this.messageListeners.find(
         listener => listener.systemId === message.BMSHWRSN
       );

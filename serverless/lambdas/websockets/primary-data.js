@@ -48,20 +48,16 @@ exports.handler = async event => {
     };
 
     const connectedDashboards = await Dynamo.query(paramsForConnections);
-    console.log('connectedDashboards:', connectedDashboards);
-    const sendDataToDashboards = [];
-    connectedDashboards.forEach(({ DomainName, Stage, ConnectionId }) => {
-      sendDataToDashboards.push(
-        WebSocket.send({
-          DomainName,
-          Stage,
-          ConnectionId,
-          Message: data
-        })
-      );
-    });
-    Promise.all(sendDataToDashboards);
-    console.log('Data sent to all dashboars: ', connectedDashboards);
+    for (const { DomainName, Stage, ConnectionId } of connectedDashboards) {
+      await WebSocket.send({
+        DomainName,
+        Stage,
+        ConnectionId,
+        Message: data
+      });
+    }
+
+    console.log('Data sent to all connected dashboars.');
 
     return Responses._200({ message: 'New primary data' });
   } catch (error) {

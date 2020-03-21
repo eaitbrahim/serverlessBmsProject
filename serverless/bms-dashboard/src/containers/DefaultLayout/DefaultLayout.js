@@ -37,10 +37,7 @@ class DefaultLayout extends Component {
   socketConnection = null;
 
   dashboardMessageHandler = message => {
-    console.log('dashboardMessageHandler:', message);
-    if (message.BMSHWRSN === this.state.systemId) {
-      this.setState(prevState => ({ primaryData: { ...message } }));
-    }
+    this.setState(prevState => ({ primaryData: { ...message } }));
   };
 
   loading = () => (

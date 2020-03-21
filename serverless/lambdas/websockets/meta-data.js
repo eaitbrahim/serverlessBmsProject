@@ -17,11 +17,12 @@ exports.handler = async event => {
     const connection = await Dynamo.get(params);
 
     const body = JSON.parse(event.body);
+    const connectionData = {
+      ...connection,
+      System: body.BMSHWRSN
+    };
     await Dynamo.writeConnection(
-      {
-        ...connection,
-        System: body.BMSHWRSN
-      },
+      connectionData,
       process.env.tableNameConnection
     );
 

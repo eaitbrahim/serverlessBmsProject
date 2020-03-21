@@ -26,6 +26,8 @@ CREATE TABLE "PrimaryData" (
 	"IDsgLimit"	INTEGER NOT NULL,
 	"HB2"	INTEGER NOT NULL,
 	"SOH"	INTEGER NOT NULL,
+    "SOHMin"	INTEGER NOT NULL,
+    "SOHMax"	INTEGER NOT NULL,
 	"OpStatus"	INTEGER NOT NULL,
 	"RlyStatus"	INTEGER NOT NULL,
 	"VBattery"	INTEGER NOT NULL,
@@ -58,28 +60,28 @@ CREATE TABLE "SyncLog" (
 );
 
 INSERT INTO MetaData  (Cluster, "Key", "Value") VALUES 
-('identification',	'ConfigVer',	'1.2.0'),
-('identification',	'BusinessUnit', 'eAGV'),
-('identification',	'EdgeHWRSN', 'Ax_12598324'),
-('identification',	'EdgeSWRVer', 'Ax_2.5.3'),
-('identification',	'BMSHWRSN', 'EigerC63B124'),
-('identification',	'BMSSWRVer', 'EigerC63S456'),
-('identification',	'CANMappingVer', 'C63CANV100'),
-('systtem',	'Technology', 'LTO'),
-('systtem',	'ModConfig', '6s4p'),
-('systtem',	'StrConfig', '6S6s4p'),
-('systtem',	'BatConfig', '1P6S6s4p'),
-('systtem',	'NomVoltage', '80V'),
-('systtem',	'NomCapacity', '120Ah'),
-('Cusotmer',	'Cusotmer', 'Generic_1'),
-('Location',	'Location', 'somewhere'),
-('FabricationDate',	'FabricationDate', '01.01.2020'),
-('InstallationDate',	'InstallationDate', '01.01.2020'),
-('ContactMail',	'ContactMail', 'support@leclanche.com'),
-('ContactTel',	'ContactTel', '004121021021021'),
-('CANINFO',	'CANChannel', '1'),
-('CANINFO',	'CANSpeed', '500'),
-('CANINFO',	'CANTimeout', '10');
+('Identification',	'ConfigVer',	'1.2.0'),
+('Identification',	'BusinessUnit', 'eAGV'),
+('Identification',	'EdgeHWRSN', 'Ax_12598324'),
+('Identification',	'EdgeSWRVer', 'Ax_2.5.3'),
+('Identification',	'BMSHWRSN', 'EigerC63B124'),
+('Identification',	'BMSSWRVer', 'EigerC63S456'),
+('Identification',	'CANMappingVer', 'C63CANV100'),
+('SystemDescription',	'Technology', 'LTO'),
+('SystemDescription',	'ModConfig', '6s4p'),
+('SystemDescription',	'StrConfig', '6S6s4p'),
+('SystemDescription',	'BatConfig', '1P6S6s4p'),
+('SystemDescription',	'NomVoltage', '80V'),
+('SystemDescription',	'NomCapacity', '120Ah'),
+('ProductInfo',	'Customer', 'Generic_1'),
+('ProductInfo',	'Location', 'somewhere'),
+('ProductInfo',	'FabricationDate', '01.01.2020'),
+('ProductInfo',	'InstallationDate', '01.01.2020'),
+('ProductInfo',	'ContactMail', 'support@leclanche.com'),
+('ProductInfo',	'ContactTel', '004121021021021'),
+('CANInfo',	'CANChannel', '1'),
+('CANInfo',	'CANSpeed', '500'),
+('CANInfo',	'CANTimeout', '10');
 
 INSERT INTO PrimaryData  (
     Localtime,
@@ -91,6 +93,8 @@ INSERT INTO PrimaryData  (
 	IDsgLimit,
 	HB2,
 	SOH,
+    SOHMax,
+    SOHMin,
 	OpStatus,
 	RlyStatus,
 	VBattery,
@@ -137,6 +141,8 @@ INSERT INTO PrimaryData  (
     24,
     25,
     26,
+    27,
+    28,
     date('now'),
     'EigerC63B124'   
 ),
@@ -167,6 +173,8 @@ INSERT INTO PrimaryData  (
     25,
     26,
     27,
+    28,
+    29,
     date('now'),
     'EigerC63B124'    
 ),
@@ -197,13 +205,11 @@ INSERT INTO PrimaryData  (
     26,
     27,
     28,
+    29,
+    30,
     date('now'),
     'EigerC63B124'    
 );
-
-INSERT INTO  SyncLog (SystemId, PrimaryDataId) VALUES ('EigerC63B124', 1);
-INSERT INTO SyncLog (SystemId, PrimaryDataId) VALUES ('EigerC63B124', 2);
-INSERT INTO SyncLog (SystemId, PrimaryDataId) VALUES ('EigerC63B124', 3);
 
 INSERT INTO CANMapping (Key, Value, UNIT) VALUES
 ('HB1','Hearbeat 1','%'),
@@ -214,6 +220,8 @@ INSERT INTO CANMapping (Key, Value, UNIT) VALUES
 ('IDsgLimit','Discharge Current Limit','100mA'),
 ('HB2','Hearbeat 2','%'),
 ('SOH','State of Health','%'),
+('SOHMax','State of Health Max','%'),
+('SOHMin','State of Health Min','%'),
 ('OpStatus','Operation Status','%'),
 ('RlyStatus','Contactor Status','%'),
 ('VBattery','Stack voltage','0.1V'),

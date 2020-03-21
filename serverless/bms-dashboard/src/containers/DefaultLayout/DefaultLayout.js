@@ -6,33 +6,42 @@ import {
   AppAside,
   AppFooter,
   AppHeader,
-  AppBreadcrumb2 as AppBreadcrumb,
-  AppSidebarNav2 as AppSidebarNav
+  AppBreadcrumb2 as AppBreadcrumb
 } from '@coreui/react';
 
 import routes from '../../routes';
-import agent from '../../api/agent';
+import agent from '../../services/apiService';
+import { getWSService } from '../../services/webSocketService';
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
+const chatMessageHandler = message => {
+  console.log('Received message:', message);
+};
 
 class DefaultLayout extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isSystemOnline: false,
-      systemId: '',
-      systems: [],
-      metaData: {
-        identification: [],
-        canInfo: [],
-        systemDescription: [],
-        productInfo: []
-      },
-      primaryData: {}
-    };
-  }
+  state = {
+    isSystemOnline: false,
+    systemId: '',
+    systems: [],
+    metaData: {
+      identification: [],
+      canInfo: [],
+      systemDescription: [],
+      productInfo: []
+    },
+    primaryData: {}
+  };
+
+  socketConnection = null;
+
+  dashboardMessageHandler = message => {
+    console.log('dashboardMessageHandler:', message);
+    if (message.BMSHWRSN === this.state.systemId) {
+      this.setState(prevState => ({ primaryData: { ...message } }));
+    }
+  };
 
   loading = () => (
     <div className='animated fadeIn pt-1 text-center'>Loading...</div>
@@ -63,35 +72,28 @@ class DefaultLayout extends Component {
     Promise.all([metaDataPromise, primaryDataPromise]).then(responses => {
       const { IsOnline, BMSHWRSN } = responses[0].metaData;
       const {
-        identification,
-        CANINFO,
-        systtem,
-        Cusotmer,
-        Location,
-        FabricationDate,
-        InstallationDate,
-        ContactMail,
-        ContactTel
+        Identification,
+        CANInfo,
+        SystemDescription,
+        ProductInfo
       } = responses[0].metaData.Cluster;
-      const productInfo = [];
-      Cusotmer.forEach(c => productInfo.push(c));
-      Location.forEach(l => productInfo.push(l));
-      FabricationDate.forEach(fd => productInfo.push(fd));
-      InstallationDate.forEach(id => productInfo.push(id));
-      ContactMail.forEach(cm => productInfo.push(cm));
-      ContactTel.forEach(ct => productInfo.push(ct));
 
       this.setState({
         isSystemOnline: IsOnline,
         systemId: BMSHWRSN,
         metaData: {
-          identification,
-          canInfo: CANINFO,
-          systemDescription: systtem,
-          productInfo
+          identification: Identification,
+          canInfo: CANInfo,
+          systemDescription: SystemDescription,
+          productInfo: ProductInfo
         },
         primaryData: { ...responses[1].primaryData }
       });
+
+      getWSService().addMessageListener(
+        this.state.systemId,
+        this.dashboardMessageHandler
+      );
     });
   };
 

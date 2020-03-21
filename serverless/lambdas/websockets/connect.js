@@ -12,7 +12,7 @@ exports.handler = async event => {
 
   const data = {
     ConnectionId,
-    System: 'Init',
+    System: 'Dashboard',
     ConnectionDate: Date.now(),
     DomainName,
     Stage

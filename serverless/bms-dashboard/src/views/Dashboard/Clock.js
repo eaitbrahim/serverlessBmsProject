@@ -26,9 +26,7 @@ class Clock extends Component {
     return (
       <Card className='text-white bg-warning'>
         <CardBody>
-          <div className='small text-value'>
-            Current date & time {this.state.time}
-          </div>
+          <div className='small text-value'>Current time {this.state.time}</div>
         </CardBody>
       </Card>
     );

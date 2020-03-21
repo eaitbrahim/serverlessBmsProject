@@ -16,7 +16,7 @@ class Repository {
   getNewPrimaryData() {
     console.log('Reading primary data...');
     return this.dao.all(
-      `SELECT * FROM PrimaryData  WHERE Id NOT IN (SELECT PrimaryDataId FROM SyncLog)`,
+      `SELECT * FROM PrimaryData WHERE Id NOT IN (SELECT PrimaryDataId FROM SyncLog)`,
       []
     );
   }
@@ -29,9 +29,9 @@ class Repository {
       SyncComment,
       Processing,
       Processed,
-      performanceData
+      primaryData
     } = syncLog;
-    const dataToInsert = performanceData.map(p => {
+    const dataToInsert = primaryData.map(p => {
       return `('${BMSHWRSN}', ${p}, ${SyncDate}, '${SyncComment}', ${Processing}, ${Processed})`;
     });
 
@@ -51,10 +51,10 @@ class Repository {
       SyncComment,
       Processing,
       Processed,
-      performanceData
+      primaryData
     } = syncLog;
     return this.dao.run(
-      `UPDATE SyncLog SET SyncDate=?, SyncComment=?, Processing=?, Processed=? WHERE SystemId = ? AND PrimaryDataId IN (${performanceData.join(
+      `UPDATE SyncLog SET SyncDate=?, SyncComment=?, Processing=?, Processed=? WHERE SystemId = ? AND PrimaryDataId IN (${primaryData.join(
         ','
       )})`,
       [SyncDate, SyncComment, Processing, Processed, BMSHWRSN]

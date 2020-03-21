@@ -61,6 +61,7 @@ const Dynamo = {
   },
 
   async writeConnection(data, TableName) {
+    console.log('Write to connection: ', data);
     if (!data.ConnectionId) {
       throw Error('no ConnectionId on the data');
     }

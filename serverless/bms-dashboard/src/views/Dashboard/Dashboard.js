@@ -1,94 +1,31 @@
-import React, { Component, lazy, Suspense } from 'react';
-import {
-  Badge,
-  Button,
-  ButtonDropdown,
-  ButtonGroup,
-  ButtonToolbar,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Col,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Progress,
-  Row,
-  Table
-} from 'reactstrap';
+import React, { Suspense } from 'react';
+import { Col, Row } from 'reactstrap';
+//import moment from 'moment';
 
 import IsOnline from './IsOnline';
 import LastTime from './LastTime';
 import Clock from './Clock';
+import SocSoh from './SocSoh';
 
-const URL = 'wss://5xcuq4dlm1.execute-api.eu-central-1.amazonaws.com/dev';
 const loading = () => (
   <div className='animated fadeIn pt-1 text-center'>Loading...</div>
 );
 
 const lastTime = primaryData => {
-  console.log('primaryData:', primaryData);
   if (
     Object.keys(primaryData).length === 0 &&
     primaryData.constructor === Object
   ) {
     return '';
   }
+  //return moment(new Date(primaryData.ReceivedDateTime)).format('HH:mm:ss');
   return primaryData.CreatedAt.substring(0, primaryData.CreatedAt.indexOf('.'))
     .replace('T', ', ')
     .replace(':', '/')
     .replace(':', '/');
 };
-//class Dashboard extends Component {
+
 const Dashboard = props => {
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     isSystemOnline: this.props.isSystemOnline,
-  //     systemId: this.props.systemId,
-  //     primaryData: { ...this.props.primaryData }
-  //   };
-
-  //   this.ws = new WebSocket(URL);
-  // }
-
-  // connectToWebSocket = () => {
-  //   this.ws.onopen = () => {
-  //     // on connecting, do nothing but log it to the console
-  //     console.log('connected');
-  //   };
-
-  //   this.ws.onmessage = evt => {
-  //     // on receiving a message, add it to the list of messages
-  //     const message = JSON.parse(evt.data);
-  //     this.addMessage(message);
-  //   };
-
-  //   this.ws.onclose = () => {
-  //     console.log('disconnected');
-  //     // automatically try to reconnect on connection loss
-  //     this.setState({
-  //       ws: new WebSocket(URL),
-  //       isSystemOnline: false
-  //     });
-  //   };
-  // };
-
-  // addMessage = message => {
-  //   if (message.BMSHWRSN === this.state.systemId) {
-  //     this.setState(prevState => ({ primaryData: { ...message.primaryData } }));
-  //   }
-  // };
-
-  // componentDidMount() {
-  //   this.connectToWebSocket();
-  //   console.log('state:', this.state);
-  // }
-
-  //render() {
   return (
     <div className='animated fadeIn'>
       <Row>
@@ -111,9 +48,22 @@ const Dashboard = props => {
           <Clock />
         </Col>
       </Row>
+
+      <Row>
+        <Col xs='6' sm='6' lg='6'>
+          <Suspense fallback={loading()}>
+            <SocSoh
+              series={[props.primaryData.SOC, props.primaryData.SOH]}
+              socMin={props.primaryData.SOCMin}
+              socMax={props.primaryData.SOCMax}
+              sohMin={props.primaryData.SOHMin}
+              sohMax={props.primaryData.SOHMax}
+            />
+          </Suspense>
+        </Col>
+      </Row>
     </div>
   );
-  //}
 };
 
 export default Dashboard;

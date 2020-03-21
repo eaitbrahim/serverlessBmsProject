@@ -7,6 +7,7 @@ provider:
   region: eu-central-1
   environment:
     tableNameConnection: ${self:custom.tableNameConnection}
+    indexNameConnection: ${self:custom.indexNameConnection}
     tableNameCanMapping: ${self:custom.tableNameCanMapping}
     tableNameMetaData: ${self:custom.tableNameMetaData}
     tableNamePrimaryData: ${self:custom.tableNamePrimaryData}
@@ -20,6 +21,7 @@ provider:
 
 custom:
   tableNameConnection: Connections
+  indexNameConnection: Connections_GSI1
   tableNameCanMapping: CanMapping
   tableNameMetaData: MetaData
   tableNamePrimaryData: PrimaryData
@@ -93,9 +95,19 @@ resources:
         AttributeDefinitions:
           - AttributeName: ConnectionId
             AttributeType: S
+          - AttributeName: System
+            AttributeType: S
         KeySchema:
           - AttributeName: ConnectionId
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:custom.indexNameConnection}
+            KeySchema:
+              - AttributeName: System
+                KeyType: HASH
+            Projection:
+              NonKeyAttributes: [ConnectionId, DomainName, Stage]
+              ProjectionType: INCLUDE
         BillingMode: PAY_PER_REQUEST
     CanMappingTable:
       Type: AWS::DynamoDB::Table

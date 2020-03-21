@@ -48,24 +48,24 @@ const getCanMapping = () => {
 
 const getPrimaryData = BMSHWRSN => {
   return new Promise((resolve, reject) => {
-    let data = { BMSHWRSN, performanceData: [] };
+    let data = { BMSHWRSN, primaryData: [] };
     repo
       .getNewPrimaryData()
       .then(newPrimaryData => {
         newPrimaryData.forEach(d => {
-          data.performanceData.push(d);
+          data.primaryData.push(d);
         });
         return data;
       })
-      .then(({ BMSHWRSN, performanceData }) => {
-        if (performanceData.length > 0) {
+      .then(({ BMSHWRSN, primaryData }) => {
+        if (primaryData.length > 0) {
           repo.createSyncLog({
             BMSHWRSN,
             SyncDate: Date.now(),
             SyncComment: 'Processing',
             Processing: 1,
             Processed: 0,
-            performanceData: performanceData.map(d => d.Id)
+            primaryData: primaryData.map(d => d.Id)
           });
 
           resolve(data);
@@ -86,7 +86,7 @@ const setProcessedData = data => {
       SyncComment: 'Processed',
       Processing: 1,
       Processed: 1,
-      performanceData: [parseInt(data.Id)]
+      primaryData: [parseInt(data.Id)]
     });
   });
 };

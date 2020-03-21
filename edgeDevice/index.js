@@ -45,13 +45,11 @@ ws.on('open', function open() {
 
   // Send primary data on interval
   let primaryDataInterval = setInterval(() => {
-    system.getPrimaryData(BMSHWRSN).then(primaryData => {
-      primaryData.performanceData.forEach(pd => {
-        if (pd.BMSHWRSN !== '') {
-          pd.action = 'primary-data';
-          console.log(`${Date.now()} Sending primary data to the server.`);
-          ws.send(JSON.stringify(pd));
-        }
+    system.getPrimaryData(BMSHWRSN).then(({ primaryData }) => {
+      primaryData.forEach(pd => {
+        pd.action = 'primary-data';
+        console.log(`${Date.now()} Sending primary data to the server.`);
+        ws.send(JSON.stringify(pd));
       });
     });
   }, 5000);
@@ -62,5 +60,6 @@ ws.on('open', function open() {
 });
 
 ws.on('message', function incoming(data) {
+  console.log('Received Data: ', data);
   system.setProcessedData(JSON.parse(data));
 });

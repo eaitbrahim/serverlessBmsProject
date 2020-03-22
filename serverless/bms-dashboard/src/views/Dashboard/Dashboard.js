@@ -5,6 +5,7 @@ import IsOnline from './IsOnline';
 import LastTime from './LastTime';
 import Clock from './Clock';
 import SocSoh from './SocSoh';
+import TemperatureVoltage from './TemperatureVoltage';
 
 const loading = () => (
   <div className='animated fadeIn pt-1 text-center'>Loading...</div>
@@ -49,6 +50,18 @@ const Dashboard = props => {
               sohMax={props.primaryData.SOHMax}
             />
           </Suspense>
+        </Col>
+        <Col xs='6' sm='6' lg='6'>
+          <TemperatureVoltage
+            TModMax={props.primaryData.TModMax}
+            TModMaxID={props.primaryData.TModMaxID}
+            TModMin={props.primaryData.TModMin}
+            TModMinID={props.primaryData.TModMinID}
+            VCellMax={props.primaryData.VCellMax}
+            VCellMaxID={props.primaryData.VCellMaxID}
+            VCellMin={props.primaryData.VCellMin}
+            VCellMinID={props.primaryData.VCellMinID}
+          />
         </Col>
       </Row>
     </div>

@@ -5,7 +5,11 @@ import alarmsData from './alarmsData';
 
 const AlarmRow = ({ alarmRow, alarmStatus }) => {
   const getBadge = (status, bit, name) => {
-    return name === 'NA' ? 'secondary' : status === bit ? 'danger' : 'success';
+    return name === 'NA'
+      ? 'secondary'
+      : status[bit - 1] === 1
+      ? 'danger'
+      : 'success';
   };
 
   return (

@@ -85,7 +85,7 @@ class DefaultLayout extends Component {
           {
             date: prevState.primaryData.Localtime,
             type: 'Alarm',
-            bit: prevState.primaryData.Alarms
+            status: prevState.primaryData.Alarms
           }
         ]
       }));
@@ -98,7 +98,7 @@ class DefaultLayout extends Component {
           {
             date: prevState.primaryData.Localtime,
             type: 'Warning',
-            bit: prevState.primaryData.Warnings
+            status: prevState.primaryData.Warnings
           }
         ]
       }));
@@ -109,12 +109,12 @@ class DefaultLayout extends Component {
           {
             date: prevState.primaryData.Localtime,
             type: 'Operating',
-            bit: prevState.primaryData.OpStatus
+            status: prevState.primaryData.OpStatus
           },
           {
             date: prevState.primaryData.Localtime,
             type: 'Contactor',
-            bit: prevState.primaryData.RlyStatus
+            status: prevState.primaryData.RlyStatus
           }
         ]
       }));

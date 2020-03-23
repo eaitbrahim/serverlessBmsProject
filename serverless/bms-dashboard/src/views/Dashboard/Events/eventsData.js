@@ -13,7 +13,7 @@ const eventsData = [
   {
     type: 'Contactor',
     state: [
-      { bit: 0, ATIMdefinition: 'BMS_SAFETY_OPEN' },
+      { bit: 0, definition: 'BMS_SAFETY_OPEN' },
       { bit: 1, definition: 'MS_SAFETY_CLOSED' },
       { bit: 2, definition: 'MS_SAFETY_WAITING_OPEN' },
       { bit: 3, definition: 'BMS_SAFETY_PRECHARGE' }

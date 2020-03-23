@@ -22,6 +22,45 @@ const Dashboard = props => {
     return typeof canMappingObj !== 'undefined' ? canMappingObj.Unit : '';
   };
 
+  const toBinary = integer => {
+    let result = [];
+    if (typeof integer !== 'undefined') {
+      let str = integer.toString(2);
+      result = str
+        .padStart(32, '0')
+        .split('')
+        .reverse()
+        .map(r => parseInt(r));
+    }
+
+    return result;
+  };
+
+  const constructEventLogs = events => {
+    let eventLogList = [];
+    for (let event of events) {
+      if (event.type === 'Alarm' || event.type === 'Warning') {
+        let statusList = toBinary(event.status);
+        statusList.forEach((status, index) => {
+          if (status === 1) {
+            eventLogList.push({
+              date: event.date,
+              type: event.type,
+              bit: index + 1
+            });
+          }
+        });
+      } else {
+        eventLogList.push({
+          date: event.date,
+          type: event.type,
+          bit: event.status
+        });
+      }
+    }
+    return eventLogList;
+  };
+
   return (
     <div className='animated fadeIn'>
       <Row>
@@ -81,19 +120,19 @@ const Dashboard = props => {
 
       <Row>
         <Col xs='6' sm='6' lg='12'>
-          <Alarms alarmStatus={props.primaryData.Alarms} />
+          <Alarms alarmStatus={toBinary(props.primaryData.Alarms)} />
         </Col>
       </Row>
 
       <Row>
         <Col xs='6' sm='6' lg='12'>
-          <Warnings warningStatus={props.primaryData.Warnings} />
+          <Warnings warningStatus={toBinary(props.primaryData.Warnings)} />
         </Col>
       </Row>
 
       <Row>
         <Col xs='6' sm='6' lg='12'>
-          <Events eventLog={props.eventLog} />
+          <Events eventLogList={constructEventLogs(props.eventLog)} />
         </Col>
       </Row>
     </div>

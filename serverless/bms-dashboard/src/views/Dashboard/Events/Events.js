@@ -5,7 +5,17 @@ import alarmsData from '../Alarms/alarmsData';
 import warningsData from '../Warnings/warningsData';
 import eventsData from './eventsData';
 
-const EventRow = ({ eventRow }) => {
+const EventRow = ({ dataRow }) => {
+  return (
+    <tr>
+      <th scope='row'>{dataRow.date}</th>
+      <td className='text-center'>{dataRow.badge}</td>
+      <td className='text-center'>{dataRow.message}</td>
+    </tr>
+  );
+};
+
+const Events = props => {
   const getBadge = type => {
     let color;
     let typeText = type;
@@ -13,15 +23,27 @@ const EventRow = ({ eventRow }) => {
       color = 'danger';
     } else if (type === 'Warning') {
       color = 'warning';
-    } else {
-      color = 'secondary';
+    } else if (type !== 'Alarm') {
       typeText = 'Info';
+      color = 'secondary';
     }
 
     return <Badge color={color}>{typeText}</Badge>;
   };
 
   const getMessage = (bit, type) => {
+    let data = getData(bit, type);
+
+    if (typeof data !== 'undefined') {
+      if (type !== 'Alarm' && type !== 'Warning') {
+        data.definition = type + ' State ' + data.definition;
+      }
+      return data.definition;
+    }
+    return '';
+  };
+
+  const getData = (bit, type) => {
     let data;
     if (type === 'Alarm') {
       for (let a of alarmsData) {
@@ -40,29 +62,30 @@ const EventRow = ({ eventRow }) => {
         if (a.type === type) {
           data = a.state.find(a => a.bit === bit);
           if (typeof data !== 'undefined') {
-            data.definition = type + ' State ' + data.definition;
             break;
           }
         }
       }
     }
 
-    if (typeof data !== 'undefined') {
-      return data.definition;
-    }
-    return '';
+    return data;
   };
 
-  return (
-    <tr>
-      <th scope='row'>{eventRow.date}</th>
-      <td className='text-center'>{getBadge(eventRow.type)}</td>
-      <td className='text-center'>{getMessage(eventRow.bit, eventRow.type)}</td>
-    </tr>
-  );
-};
+  const buildEventRows = () => {
+    const dataRows = props.eventLogList.map(event => ({
+      date: event.date,
+      badge: getBadge(event.type),
+      message: getMessage(event.bit, event.type)
+    }));
 
-const Events = props => {
+    console.log('dataRows:', dataRows);
+    const filteredDataRow = dataRows.filter(dr => dr.message !== 'NA');
+    console.log('filteredDataRow:', filteredDataRow);
+    return filteredDataRow.map((data, index) => (
+      <EventRow key={index} dataRow={data} />
+    ));
+  };
+
   return (
     <Card>
       <CardBody>
@@ -79,11 +102,7 @@ const Events = props => {
                 <th className='text-center'>Message</th>
               </tr>
             </thead>
-            <tbody>
-              {props.eventLog.map((event, index) => (
-                <EventRow key={index} eventRow={event} />
-              ))}
-            </tbody>
+            <tbody>{buildEventRows()}</tbody>
           </Table>
         </div>
       </CardBody>

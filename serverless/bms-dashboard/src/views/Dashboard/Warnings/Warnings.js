@@ -5,7 +5,11 @@ import warningsData from './warningsData';
 
 const WarningRow = ({ warningRow, warningStatus }) => {
   const getBadge = (status, bit, name) => {
-    return name === 'NA' ? 'secondary' : status === bit ? 'warning' : 'success';
+    return name === 'NA'
+      ? 'secondary'
+      : status[bit - 1] === 1
+      ? 'warning'
+      : 'success';
   };
 
   return (
@@ -22,7 +26,7 @@ const WarningRow = ({ warningRow, warningStatus }) => {
   );
 };
 
-const Alarms = props => {
+const Warnings = props => {
   return (
     <Card>
       <CardBody>
@@ -59,4 +63,4 @@ const Alarms = props => {
   );
 };
 
-export default Alarms;
+export default Warnings;

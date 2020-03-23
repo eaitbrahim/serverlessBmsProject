@@ -23,6 +23,7 @@ class DefaultLayout extends Component {
     systemId: '',
     systems: [],
     canMapping: [],
+    eventLog: [],
     metaData: {
       identification: [],
       canInfo: [],
@@ -41,6 +42,7 @@ class DefaultLayout extends Component {
           primaryData: { ...message },
           isSystemOnline: message.IsOnline
         }));
+        this.addEventLog();
       } else {
         this.setState(prevState => ({
           isSystemOnline: message.IsOnline
@@ -63,6 +65,7 @@ class DefaultLayout extends Component {
       isSystemOnline: false,
       systemId: '',
       canMapping: [],
+      eventLog: [],
       metaData: {
         identification: [],
         canInfo: [],
@@ -72,6 +75,50 @@ class DefaultLayout extends Component {
       primaryData: {}
     });
     this.getDataById(s);
+  }
+
+  addEventLog() {
+    if (this.state.primaryData.Alatms !== 0) {
+      this.setState(prevState => ({
+        eventLog: [
+          ...prevState.eventLog,
+          {
+            date: prevState.primaryData.Localtime,
+            type: 'Alarm',
+            bit: prevState.primaryData.Alarms
+          }
+        ]
+      }));
+    }
+
+    if (this.state.primaryData.Warnings !== 0) {
+      this.setState(prevState => ({
+        eventLog: [
+          ...prevState.eventLog,
+          {
+            date: prevState.primaryData.Localtime,
+            type: 'Warning',
+            bit: prevState.primaryData.Warnings
+          }
+        ]
+      }));
+
+      this.setState(prevState => ({
+        eventLog: [
+          ...prevState.eventLog,
+          {
+            date: prevState.primaryData.Localtime,
+            type: 'Operating',
+            bit: prevState.primaryData.OpStatus
+          },
+          {
+            date: prevState.primaryData.Localtime,
+            type: 'Contactor',
+            bit: prevState.primaryData.RlyStatus
+          }
+        ]
+      }));
+    }
   }
 
   getDataById = systemId => {
@@ -102,6 +149,7 @@ class DefaultLayout extends Component {
           canMapping: [...responses[2].canMapping]
         }));
 
+        this.addEventLog();
         getWSService().addMessageListener(
           this.state.systemId,
           this.dashboardMessageHandler
@@ -150,6 +198,7 @@ class DefaultLayout extends Component {
                             systemId={this.state.systemId}
                             primaryData={this.state.primaryData}
                             canMapping={this.state.canMapping}
+                            eventLog={this.state.eventLog}
                           />
                         )}
                       />

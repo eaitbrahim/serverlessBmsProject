@@ -6,6 +6,9 @@ import LastTime from './LastTime';
 import Clock from './Clock';
 import SocSoh from './SocSoh';
 import TemperatureVoltage from './TemperatureVoltage';
+import Alarms from './Alarms/Alarms';
+import Warnings from './Warnings/Warnings';
+import Events from './Events/Events';
 
 const loading = () => (
   <div className='animated fadeIn pt-1 text-center'>Loading...</div>
@@ -73,6 +76,24 @@ const Dashboard = props => {
             VCellMinUnit={getUnitFromCanMapping('VCellMin')}
             VCellMinID={props.primaryData.VCellMinID}
           />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col xs='6' sm='6' lg='12'>
+          <Alarms alarmStatus={props.primaryData.Alarms} />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col xs='6' sm='6' lg='12'>
+          <Warnings warningStatus={props.primaryData.Warnings} />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col xs='6' sm='6' lg='12'>
+          <Events eventLog={props.eventLog} />
         </Col>
       </Row>
     </div>

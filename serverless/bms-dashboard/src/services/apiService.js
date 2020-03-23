@@ -15,6 +15,7 @@ const requests = {
 
 const fetchData = {
   listOfSystems: () => requests.get('/get-systems'),
+  listOfCanMapping: BMSHWRSN => requests.get(`/get-can-mapping/${BMSHWRSN}`),
   metaDataById: BMSHWRSN => requests.get(`/get-meta-data/${BMSHWRSN}`),
   lastPrimaryDataById: BMSHWRSN =>
     requests.get(`/get-last-primary-data/${BMSHWRSN}`)

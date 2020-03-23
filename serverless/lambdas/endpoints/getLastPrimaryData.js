@@ -22,13 +22,13 @@ exports.handler = async event => {
       Limit: 1
     };
     console.log('params:', params);
-    const primaryData = await Dynamo.query(params);
+    const result = await Dynamo.query(params);
 
-    if (!primaryData) {
+    if (!result) {
       return Responses._400({ message: 'Failed to get primary data.' });
     }
 
-    return Responses._200({ primaryData: primaryData[0] });
+    return Responses._200({ primaryData: result[0] });
   } catch (error) {
     console.log('Error: ', error);
     return Responses._400({ message: 'Failed to get primary data.' });

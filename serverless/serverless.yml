@@ -85,6 +85,14 @@ functions:
           method: GET
           cors: true
           private: true
+  http-get-can-mapping:
+    handler: lambdas/endpoints/getCanMapping.handler
+    events:
+      - http:
+          path: get-can-mapping/{BMSHWRSN}
+          method: GET
+          cors: true
+          private: true
 
 resources:
   Resources:

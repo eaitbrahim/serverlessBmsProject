@@ -12,6 +12,13 @@ const loading = () => (
 );
 
 const Dashboard = props => {
+  const getUnitFromCanMapping = key => {
+    const canMappingObj = props.canMapping.find(cm => {
+      return cm.Key === key;
+    });
+    return typeof canMappingObj !== 'undefined' ? canMappingObj.Unit : '';
+  };
+
   return (
     <div className='animated fadeIn'>
       <Row>
@@ -54,12 +61,16 @@ const Dashboard = props => {
         <Col xs='6' sm='6' lg='6'>
           <TemperatureVoltage
             TModMax={props.primaryData.TModMax}
+            TModMaxUnit={getUnitFromCanMapping('TModMax')}
             TModMaxID={props.primaryData.TModMaxID}
             TModMin={props.primaryData.TModMin}
+            TModMinUnit={getUnitFromCanMapping('TModMin')}
             TModMinID={props.primaryData.TModMinID}
             VCellMax={props.primaryData.VCellMax}
+            VCellMaxUnit={getUnitFromCanMapping('VCellMax')}
             VCellMaxID={props.primaryData.VCellMaxID}
             VCellMin={props.primaryData.VCellMin}
+            VCellMinUnit={getUnitFromCanMapping('VCellMin')}
             VCellMinID={props.primaryData.VCellMinID}
           />
         </Col>

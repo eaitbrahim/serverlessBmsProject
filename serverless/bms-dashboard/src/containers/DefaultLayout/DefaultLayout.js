@@ -16,15 +16,13 @@ import { getWSService } from '../../services/webSocketService';
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
-const chatMessageHandler = message => {
-  console.log('Received message:', message);
-};
 
 class DefaultLayout extends Component {
   state = {
     isSystemOnline: false,
     systemId: '',
     systems: [],
+    canMapping: [],
     metaData: {
       identification: [],
       canInfo: [],
@@ -37,15 +35,17 @@ class DefaultLayout extends Component {
   socketConnection = null;
 
   dashboardMessageHandler = message => {
-    if ('SOC' in message && 'SOCMax' in message && 'SOCMin' in message) {
-      this.setState(prevState => ({
-        primaryData: { ...message },
-        isSystemOnline: message.IsOnline
-      }));
-    } else {
-      this.setState(prevState => ({
-        isSystemOnline: message.IsOnline
-      }));
+    if (message.BMSHWRSN === this.state.systemId) {
+      if ('SOC' in message && 'SOCMax' in message && 'SOCMin' in message) {
+        this.setState(prevState => ({
+          primaryData: { ...message },
+          isSystemOnline: message.IsOnline
+        }));
+      } else {
+        this.setState(prevState => ({
+          isSystemOnline: message.IsOnline
+        }));
+      }
     }
   };
 
@@ -60,6 +60,9 @@ class DefaultLayout extends Component {
 
   changeSystem(s) {
     this.setState({
+      isSystemOnline: false,
+      systemId: '',
+      canMapping: [],
       metaData: {
         identification: [],
         canInfo: [],
@@ -74,33 +77,37 @@ class DefaultLayout extends Component {
   getDataById = systemId => {
     const metaDataPromise = agent.fetchData.metaDataById(systemId);
     const primaryDataPromise = agent.fetchData.lastPrimaryDataById(systemId);
+    const canMappingPromise = agent.fetchData.listOfCanMapping(systemId);
 
-    Promise.all([metaDataPromise, primaryDataPromise]).then(responses => {
-      const { IsOnline, BMSHWRSN } = responses[0].metaData;
-      const {
-        Identification,
-        CANInfo,
-        SystemDescription,
-        ProductInfo
-      } = responses[0].metaData.Cluster;
+    Promise.all([metaDataPromise, primaryDataPromise, canMappingPromise]).then(
+      responses => {
+        const { IsOnline, BMSHWRSN } = responses[0].metaData;
+        const {
+          Identification,
+          CANInfo,
+          SystemDescription,
+          ProductInfo
+        } = responses[0].metaData.Cluster;
 
-      this.setState(prevState => ({
-        isSystemOnline: IsOnline,
-        systemId: BMSHWRSN,
-        metaData: {
-          identification: Identification,
-          canInfo: CANInfo,
-          systemDescription: SystemDescription,
-          productInfo: ProductInfo
-        },
-        primaryData: { ...responses[1].primaryData }
-      }));
+        this.setState(prevState => ({
+          isSystemOnline: IsOnline,
+          systemId: BMSHWRSN,
+          metaData: {
+            identification: Identification,
+            canInfo: CANInfo,
+            systemDescription: SystemDescription,
+            productInfo: ProductInfo
+          },
+          primaryData: { ...responses[1].primaryData },
+          canMapping: [...responses[2].canMapping]
+        }));
 
-      getWSService().addMessageListener(
-        this.state.systemId,
-        this.dashboardMessageHandler
-      );
-    });
+        getWSService().addMessageListener(
+          this.state.systemId,
+          this.dashboardMessageHandler
+        );
+      }
+    );
   };
 
   getListOfSystems = () => {
@@ -142,6 +149,7 @@ class DefaultLayout extends Component {
                             isSystemOnline={this.state.isSystemOnline}
                             systemId={this.state.systemId}
                             primaryData={this.state.primaryData}
+                            canMapping={this.state.canMapping}
                           />
                         )}
                       />

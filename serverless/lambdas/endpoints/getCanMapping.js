@@ -9,7 +9,7 @@ exports.handler = async event => {
 
   try {
     const params = {
-      TableName: process.env.tableNameMetaData,
+      TableName: process.env.tableNameCanMapping,
       Key: {
         BMSHWRSN: event.pathParameters.BMSHWRSN
       }
@@ -18,12 +18,12 @@ exports.handler = async event => {
     const result = await Dynamo.get(params);
 
     if (!result) {
-      return Responses._400({ message: 'Failed to get meta data.' });
+      return Responses._400({ message: 'Failed to get can mapping.' });
     }
 
-    return Responses._200({ metaData: result });
+    return Responses._200({ canMapping: result.CanMapping });
   } catch (error) {
     console.log('Error: ', error);
-    return Responses._400({ message: 'Failed to get meta data.' });
+    return Responses._400({ message: 'Failed to get can mapping.' });
   }
 };

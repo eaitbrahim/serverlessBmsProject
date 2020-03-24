@@ -12,7 +12,7 @@ exports.handler = async event => {
 
   const data = {
     ConnectionId,
-    System: 'Dashboard',
+    System: 'hostname' in event.headers ? event.headers.hostname : 'Dashboard',
     ConnectionDate: Date.now(),
     DomainName,
     Stage

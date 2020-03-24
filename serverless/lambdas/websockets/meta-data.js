@@ -5,28 +5,7 @@ const Dashboard = require('./dashboard');
 exports.handler = async event => {
   console.log('event', event);
 
-  const { connectionId: ConnectionId } = event.requestContext;
-
   try {
-    //Map connection id with a system
-    const params = {
-      TableName: process.env.tableNameConnection,
-      Key: {
-        ConnectionId
-      }
-    };
-    const connection = await Dynamo.get(params);
-
-    const body = JSON.parse(event.body);
-    const connectionData = {
-      ...connection,
-      System: body.BMSHWRSN
-    };
-    await Dynamo.writeConnection(
-      connectionData,
-      process.env.tableNameConnection
-    );
-
     // Insert meta data of the system
     const data = {
       ...body,

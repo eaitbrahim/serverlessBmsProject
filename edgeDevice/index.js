@@ -3,10 +3,6 @@ const WebSocket = require('ws');
 
 const system = require('./system');
 
-const ws = new WebSocket(
-  'wss://5xcuq4dlm1.execute-api.eu-central-1.amazonaws.com/dev'
-);
-
 const nI = os.networkInterfaces();
 let MacA;
 let BMSHWRSN;
@@ -23,43 +19,54 @@ for (let key in nI) {
   }
 }
 
-ws.on('open', function open() {
-  // Send meta data
-  system.getMetaData().then(metaData => {
-    metaData.MacA = MacA;
-    if (metaData.BMSHWRSN !== '') {
-      BMSHWRSN = metaData.BMSHWRSN;
-      metaData.action = 'meta-data';
-      console.log(`${Date.now()} Sending meta data to the server.`);
+// Fetching meta data from db
+system.getMetaData().then(metaData => {
+  metaData.MacA = MacA;
+  if (metaData.BMSHWRSN !== '') {
+    BMSHWRSN = metaData.BMSHWRSN;
+    metaData.action = 'meta-data';
+    const ws = new WebSocket(
+      'wss://5xcuq4dlm1.execute-api.eu-central-1.amazonaws.com/dev',
+      {
+        headers: { hostname: BMSHWRSN }
+      }
+    );
+
+    ws.on('open', function open() {
+      console.log(
+        `Websocket connection established for the system ${BMSHWRSN}`
+      );
+      // Send meta data
+      console.log(`Sending meta data to the server.`);
       ws.send(JSON.stringify(metaData));
-    }
-  });
+      // Send CAN Mapping
+      system.getCanMapping().then(canMapping => {
+        canMapping.BMSHWRSN = BMSHWRSN;
+        canMapping.action = 'can-mapping';
+        console.log(`Sending can mapping to the server.`);
+        ws.send(JSON.stringify(canMapping));
+      });
 
-  // Send CAN Mapping
-  system.getCanMapping().then(canMapping => {
-    canMapping.BMSHWRSN = BMSHWRSN;
-    canMapping.action = 'can-mapping';
-    console.log(`${Date.now()} Sending can mapping to the server.`);
-    ws.send(JSON.stringify(canMapping));
-  });
+      // Send primary data on interval
+      let primaryDataInterval = setInterval(() => {
+        system.getPrimaryData(BMSHWRSN).then(({ primaryData }) => {
+          primaryData.forEach(pd => {
+            pd.action = 'primary-data';
+            console.log(`Sending primary data to the server.`);
+            ws.send(JSON.stringify(pd));
+          });
+        });
+      }, 5000);
 
-  // Send primary data on interval
-  let primaryDataInterval = setInterval(() => {
-    system.getPrimaryData(BMSHWRSN).then(({ primaryData }) => {
-      primaryData.forEach(pd => {
-        pd.action = 'primary-data';
-        console.log(`${Date.now()} Sending primary data to the server.`);
-        ws.send(JSON.stringify(pd));
+      ws.on('close', function close() {
+        clearInterval(primaryDataInterval);
+      });
+
+      // Receive data from server
+      ws.on('message', function incoming(data) {
+        console.log('Received Data: ', data);
+        system.setProcessedData(JSON.parse(data));
       });
     });
-  }, 5000);
-
-  ws.on('close', function close() {
-    clearInterval(primaryDataInterval);
-  });
-});
-
-ws.on('message', function incoming(data) {
-  console.log('Received Data: ', data);
-  system.setProcessedData(JSON.parse(data));
+  }
 });

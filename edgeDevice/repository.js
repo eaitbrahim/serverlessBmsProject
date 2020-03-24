@@ -9,7 +9,7 @@ class Repository {
   }
 
   getCanMapping() {
-    console.log('Reading meta data...');
+    console.log('Reading can mapping...');
     return this.dao.all(`SELECT * FROM CANMapping`, []);
   }
 

@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { Col, Row } from 'reactstrap';
 
 import IsOnline from './IsOnline';
@@ -9,10 +9,6 @@ import TemperatureVoltage from './TemperatureVoltage';
 import Alarms from './Alarms/Alarms';
 import Warnings from './Warnings/Warnings';
 import Events from './Events/Events';
-
-const loading = () => (
-  <div className='animated fadeIn pt-1 text-center'>Loading...</div>
-);
 
 const Dashboard = props => {
   const getUnitFromCanMapping = key => {
@@ -65,22 +61,20 @@ const Dashboard = props => {
     <div className='animated fadeIn'>
       <Row>
         <Col xs='12' sm='6' lg='3'>
-          <Suspense fallback={loading()}>
-            <IsOnline
-              isSystemOnline={props.isSystemOnline}
-              systemId={props.systemId}
-            />
-          </Suspense>
+          <IsOnline
+            isSystemOnline={props.isSystemOnline}
+            systemId={props.systemId}
+            loading={props.loading}
+            onLoading={e => props.onLoading()}
+          />
         </Col>
 
         <Col xs='12' sm='6' lg='5'>
-          <Suspense fallback={loading()}>
-            <LastTime
-              lastDateTime={
-                props.primaryData ? props.primaryData.Localtime : ''
-              }
-            />
-          </Suspense>
+          <LastTime
+            lastDateTime={props.primaryData ? props.primaryData.Localtime : ''}
+            loading={props.loading}
+            onLoading={e => props.onLoading()}
+          />
         </Col>
 
         <Col xs='12' sm='6' lg='4'>
@@ -90,15 +84,15 @@ const Dashboard = props => {
 
       <Row>
         <Col xs='6' sm='6' lg='6'>
-          <Suspense fallback={loading()}>
-            <SocSoh
-              series={[props.primaryData.SOC, props.primaryData.SOH]}
-              socMin={props.primaryData.SOCMin}
-              socMax={props.primaryData.SOCMax}
-              sohMin={props.primaryData.SOHMin}
-              sohMax={props.primaryData.SOHMax}
-            />
-          </Suspense>
+          <SocSoh
+            series={[props.primaryData.SOC, props.primaryData.SOH]}
+            socMin={props.primaryData.SOCMin}
+            socMax={props.primaryData.SOCMax}
+            sohMin={props.primaryData.SOHMin}
+            sohMax={props.primaryData.SOHMax}
+            loading={props.loading}
+            onLoading={e => props.onLoading()}
+          />
         </Col>
         <Col xs='6' sm='6' lg='6'>
           <TemperatureVoltage
@@ -114,25 +108,38 @@ const Dashboard = props => {
             VCellMin={props.primaryData.VCellMin}
             VCellMinUnit={getUnitFromCanMapping('VCellMin')}
             VCellMinID={props.primaryData.VCellMinID}
+            loading={props.loading}
+            onLoading={e => props.onLoading()}
           />
         </Col>
       </Row>
 
       <Row>
         <Col xs='6' sm='6' lg='12'>
-          <Alarms alarmStatus={toBinary(props.primaryData.Alarms)} />
+          <Alarms
+            alarmStatus={toBinary(props.primaryData.Alarms)}
+            loading={props.loading}
+            onLoading={e => props.onLoading()}
+          />
         </Col>
       </Row>
 
       <Row>
         <Col xs='6' sm='6' lg='12'>
-          <Warnings warningStatus={toBinary(props.primaryData.Warnings)} />
+          <Warnings
+            warningStatus={toBinary(props.primaryData.Warnings)}
+            loading={props.loading}
+            onLoading={e => props.onLoading()}
+          />
         </Col>
       </Row>
 
       <Row>
         <Col xs='6' sm='6' lg='12'>
-          <Events eventLogList={constructEventLogs(props.eventLog)} />
+          <Events
+            eventLogList={constructEventLogs(props.eventLog)}
+            onResetEventLogs={e => props.onResetEventLogs(e)}
+          />
         </Col>
       </Row>
     </div>

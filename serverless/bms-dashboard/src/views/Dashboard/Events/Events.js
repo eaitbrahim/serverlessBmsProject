@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardBody, Table, Badge } from 'reactstrap';
+import { Card, CardBody, Table, Badge, Row, Col, Button } from 'reactstrap';
 
 import alarmsData from '../Alarms/alarmsData';
 import warningsData from '../Warnings/warningsData';
@@ -32,15 +32,17 @@ const Events = props => {
   };
 
   const getMessage = (bit, type) => {
+    let result = '';
     let data = getData(bit, type);
 
     if (typeof data !== 'undefined') {
       if (type !== 'Alarm' && type !== 'Warning') {
-        data.definition = type + ' State ' + data.definition;
+        result = type + ' State ' + data.definition;
+      } else {
+        result = data.definition;
       }
-      return data.definition;
     }
-    return '';
+    return result;
   };
 
   const getData = (bit, type) => {
@@ -78,33 +80,45 @@ const Events = props => {
       message: getMessage(event.bit, event.type)
     }));
 
-    console.log('dataRows:', dataRows);
     const filteredDataRow = dataRows.filter(dr => dr.message !== 'NA');
-    console.log('filteredDataRow:', filteredDataRow);
     return filteredDataRow.map((data, index) => (
       <EventRow key={index} dataRow={data} />
     ));
   };
 
+  const renderResetButton = () => (
+    <Row>
+      <Col sm='12' className='d-none d-sm-inline-block'>
+        <Button
+          color='primary'
+          className='float-right'
+          onClick={e => props.onResetEventLogs(e)}
+        >
+          <i className='icon-refresh'></i> Reset
+        </Button>
+      </Col>
+    </Row>
+  );
+
+  const renderEventTable = () => (
+    <div class='table-wrapper-scroll-y my-custom-scrollbar mt-3'>
+      <Table hover responsive className='table-outline mb-0 d-none d-sm-table'>
+        <thead className='thead-light'>
+          <tr>
+            <th>Date</th>
+            <th className='text-center'>Type</th>
+            <th className='text-center'>Message</th>
+          </tr>
+        </thead>
+        <tbody>{buildEventRows()}</tbody>
+      </Table>
+    </div>
+  );
   return (
     <Card>
       <CardBody>
-        <div class='table-wrapper-scroll-y my-custom-scrollbar'>
-          <Table
-            hover
-            responsive
-            className='table-outline mb-0 d-none d-sm-table'
-          >
-            <thead className='thead-light'>
-              <tr>
-                <th>Date</th>
-                <th className='text-center'>Type</th>
-                <th className='text-center'>Message</th>
-              </tr>
-            </thead>
-            <tbody>{buildEventRows()}</tbody>
-          </Table>
-        </div>
+        {renderResetButton()}
+        {renderEventTable()}
       </CardBody>
     </Card>
   );

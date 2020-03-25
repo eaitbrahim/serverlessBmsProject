@@ -30,34 +30,38 @@ const Warnings = props => {
   return (
     <Card>
       <CardBody>
-        <Table
-          hover
-          responsive
-          className='table-outline mb-0 d-none d-sm-table'
-        >
-          <thead className='thead-light'>
-            <tr>
-              <th>Warning Status</th>
-              <th className='text-center'>Bit 0</th>
-              <th className='text-center'>Bit 1</th>
-              <th className='text-center'>Bit 2</th>
-              <th className='text-center'>Bit 3</th>
-              <th className='text-center'>Bit 4</th>
-              <th className='text-center'>Bit 5</th>
-              <th className='text-center'>Bit 6</th>
-              <th className='text-center'>Bit 7</th>
-            </tr>
-          </thead>
-          <tbody>
-            {warningsData.map((warningRow, index) => (
-              <WarningRow
-                key={index}
-                warningRow={warningRow}
-                warningStatus={props.warningStatus}
-              />
-            ))}
-          </tbody>
-        </Table>
+        {props.loading ? (
+          props.onLoading()
+        ) : (
+          <Table
+            hover
+            responsive
+            className='table-outline mb-0 d-none d-sm-table'
+          >
+            <thead className='thead-light'>
+              <tr>
+                <th>Warning Status</th>
+                <th className='text-center'>Bit 0</th>
+                <th className='text-center'>Bit 1</th>
+                <th className='text-center'>Bit 2</th>
+                <th className='text-center'>Bit 3</th>
+                <th className='text-center'>Bit 4</th>
+                <th className='text-center'>Bit 5</th>
+                <th className='text-center'>Bit 6</th>
+                <th className='text-center'>Bit 7</th>
+              </tr>
+            </thead>
+            <tbody>
+              {warningsData.map((warningRow, index) => (
+                <WarningRow
+                  key={index}
+                  warningRow={warningRow}
+                  warningStatus={props.warningStatus}
+                />
+              ))}
+            </tbody>
+          </Table>
+        )}
       </CardBody>
     </Card>
   );

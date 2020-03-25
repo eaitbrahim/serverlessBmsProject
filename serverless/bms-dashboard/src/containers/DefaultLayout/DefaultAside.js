@@ -1,9 +1,8 @@
-import React, { Component, Suspense } from 'react';
+import React, { Component } from 'react';
 import {
   Nav,
   NavItem,
   NavLink,
-  Progress,
   TabContent,
   TabPane,
   ListGroup,
@@ -27,10 +26,6 @@ class DefaultAside extends Component {
       dropdownOpen: false
     };
   }
-
-  loading = () => (
-    <div className='animated fadeIn pt-1 text-center'>Loading...</div>
-  );
 
   constructSystems = () => {
     return this.props.systems.map(s => {
@@ -98,7 +93,9 @@ class DefaultAside extends Component {
                 tag='a'
                 className='list-group-item-accent-warning list-group-item-divider'
               >
-                <Suspense fallback={this.loading()}>
+                {this.props.loading ? (
+                  this.props.onLoading()
+                ) : (
                   <Dropdown
                     isOpen={this.state.dropdownOpen}
                     toggle={this.toggleDropdown}
@@ -106,7 +103,7 @@ class DefaultAside extends Component {
                     <DropdownToggle caret>Systems</DropdownToggle>
                     <DropdownMenu>{this.constructSystems()}</DropdownMenu>
                   </Dropdown>
-                </Suspense>
+                )}
               </ListGroupItem>
 
               <ListGroupItem className='list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small'>
@@ -117,9 +114,9 @@ class DefaultAside extends Component {
                 tag='a'
                 className='list-group-item-accent-danger list-group-item-divider'
               >
-                <Suspense fallback={this.loading()}>
-                  {this.constructMetaData(this.props.metaData.identification)}
-                </Suspense>
+                {this.props.loading
+                  ? this.props.onLoading()
+                  : this.constructMetaData(this.props.metaData.identification)}
               </ListGroupItem>
               <ListGroupItem className='list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small'>
                 System Description
@@ -130,11 +127,11 @@ class DefaultAside extends Component {
                 href='#'
                 className='list-group-item-accent-primary list-group-item-divider'
               >
-                <Suspense fallback={this.loading()}>
-                  {this.constructMetaData(
-                    this.props.metaData.systemDescription
-                  )}
-                </Suspense>
+                {this.props.loading
+                  ? this.props.onLoading()
+                  : this.constructMetaData(
+                      this.props.metaData.systemDescription
+                    )}
               </ListGroupItem>
             </ListGroup>
           </TabPane>
@@ -149,9 +146,9 @@ class DefaultAside extends Component {
                 href='#'
                 className='list-group-item-accent-success list-group-item-divider'
               >
-                <Suspense fallback={this.loading()}>
-                  {this.constructMetaData(this.props.metaData.productInfo)}
-                </Suspense>
+                {this.props.loading
+                  ? this.props.onLoading()
+                  : this.constructMetaData(this.props.metaData.productInfo)}
               </ListGroupItem>
               <ListGroupItem className='list-group-item-accent-secondary bg-light text-center font-weight-bold text-muted text-uppercase small'>
                 CAN Info
@@ -162,9 +159,9 @@ class DefaultAside extends Component {
                 href='#'
                 className='list-group-item-accent-info list-group-item-divider'
               >
-                <Suspense fallback={this.loading()}>
-                  {this.constructMetaData(this.props.metaData.canInfo)}
-                </Suspense>
+                {this.props.loading
+                  ? this.props.onLoading()
+                  : this.constructMetaData(this.props.metaData.canInfo)}
               </ListGroupItem>
             </ListGroup>
           </TabPane>

@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { Row, Col, Card, CardBody, CardFooter, Progress } from 'reactstrap';
 import Chart from 'react-apexcharts';
 
@@ -73,55 +73,61 @@ const loading = () => (
 const SocSoh = props => {
   return (
     <Card>
-      <CardBody>
-        <Suspense fallback={loading()}>
+      {props.loading ? (
+        props.onLoading()
+      ) : (
+        <CardBody>
           <Chart
             options={optionsCircle}
             series={props.series}
             type='radialBar'
           />
-        </Suspense>
-      </CardBody>
-      <CardFooter>
-        <Row className='text-center'>
-          <Col sm={12} md className='mb-sm-2 mb-0'>
-            <div className='text-muted'>SOC Min</div>
-            <strong>{props.socMin}%</strong>
-            <Progress
-              className='progress-xs mt-2'
-              color='danger'
-              value={props.socMin}
-            />
-          </Col>
-          <Col sm={12} md className='mb-sm-2 mb-0 d-md-down-none'>
-            <div className='text-muted'>SOC Max</div>
-            <strong>{props.socMax}%</strong>
-            <Progress
-              className='progress-xs mt-2'
-              color='success'
-              value={props.socMax}
-            />
-          </Col>
-          <Col sm={12} md className='mb-sm-2 mb-0'>
-            <div className='text-muted'>SOH Min</div>
-            <strong>{props.sohMin}%</strong>
-            <Progress
-              className='progress-xs mt-2'
-              color='warning'
-              value={props.sohMin}
-            />
-          </Col>
-          <Col sm={12} md className='mb-sm-2 mb-0'>
-            <div className='text-muted'>SOH Max</div>
-            <strong>{props.sohMax}%</strong>
-            <Progress
-              className='progress-xs mt-2'
-              color='primary'
-              value={props.sohMax}
-            />
-          </Col>
-        </Row>
-      </CardFooter>
+        </CardBody>
+      )}
+      {props.loading ? (
+        props.onLoading()
+      ) : (
+        <CardFooter>
+          <Row className='text-center'>
+            <Col sm={12} md className='mb-sm-2 mb-0'>
+              <div className='text-muted'>SOC Min</div>
+              <strong>{props.socMin}%</strong>
+              <Progress
+                className='progress-xs mt-2'
+                color='danger'
+                value={props.socMin}
+              />
+            </Col>
+            <Col sm={12} md className='mb-sm-2 mb-0 d-md-down-none'>
+              <div className='text-muted'>SOC Max</div>
+              <strong>{props.socMax}%</strong>
+              <Progress
+                className='progress-xs mt-2'
+                color='success'
+                value={props.socMax}
+              />
+            </Col>
+            <Col sm={12} md className='mb-sm-2 mb-0'>
+              <div className='text-muted'>SOH Min</div>
+              <strong>{props.sohMin}%</strong>
+              <Progress
+                className='progress-xs mt-2'
+                color='warning'
+                value={props.sohMin}
+              />
+            </Col>
+            <Col sm={12} md className='mb-sm-2 mb-0'>
+              <div className='text-muted'>SOH Max</div>
+              <strong>{props.sohMax}%</strong>
+              <Progress
+                className='progress-xs mt-2'
+                color='primary'
+                value={props.sohMax}
+              />
+            </Col>
+          </Row>
+        </CardFooter>
+      )}
     </Card>
   );
 };

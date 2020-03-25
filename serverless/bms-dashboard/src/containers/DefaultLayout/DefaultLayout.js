@@ -19,6 +19,7 @@ const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
   state = {
+    loading: false,
     isSystemOnline: false,
     systemId: '',
     systems: [],
@@ -33,8 +34,6 @@ class DefaultLayout extends Component {
     primaryData: {}
   };
 
-  socketConnection = null;
-
   dashboardMessageHandler = message => {
     if (message.BMSHWRSN === this.state.systemId) {
       if ('SOC' in message && 'SOCMax' in message && 'SOCMin' in message) {
@@ -42,7 +41,7 @@ class DefaultLayout extends Component {
           primaryData: { ...message },
           isSystemOnline: message.IsOnline
         }));
-        this.addEventLog();
+        this.processEventLog();
       } else {
         this.setState(prevState => ({
           isSystemOnline: message.IsOnline
@@ -51,16 +50,16 @@ class DefaultLayout extends Component {
     }
   };
 
-  loading = () => (
+  onLoading = () => (
     <div className='animated fadeIn pt-1 text-center'>Loading...</div>
   );
 
-  signOut(e) {
+  signOut = e => {
     e.preventDefault();
     this.props.history.push('/login');
-  }
+  };
 
-  changeSystem(s) {
+  changeSystem = s => {
     this.setState({
       isSystemOnline: false,
       systemId: '',
@@ -75,57 +74,78 @@ class DefaultLayout extends Component {
       primaryData: {}
     });
     this.getDataById(s);
-  }
+  };
 
-  addEventLog() {
-    if (this.state.primaryData.Alatms !== 0) {
-      this.setState(prevState => ({
-        eventLog: [
-          ...prevState.eventLog,
-          {
-            date: prevState.primaryData.Localtime,
-            type: 'Alarm',
-            status: prevState.primaryData.Alarms
-          }
-        ]
-      }));
+  addEventLog = (type, status) => {
+    console.log('addEventLog:', type);
+    this.setState(prevState => ({
+      eventLog: [
+        {
+          date: prevState.primaryData.Localtime,
+          type,
+          status
+        },
+        ...prevState.eventLog
+      ]
+    }));
+    console.log('Added:', this.state.eventLog);
+  };
+
+  processEvent = (type, status) => {
+    const filteredArrays = this.state.eventLog.filter(
+      event => event.type === type
+    );
+    console.log('filteredArrays:', filteredArrays);
+    if (filteredArrays.length === 0) {
+      console.log('processEvent:', type);
+      this.addEventLog(type, status);
+    } else if (filteredArrays[0].status !== status) {
+      this.addEventLog(type, status);
     }
+  };
+  processEventLog = () => {
+    console.log('processEventLog');
+    this.processEvent('Operating', this.state.primaryData.OpStatus);
+    this.processEvent('Contactor', this.state.primaryData.RlyStatus);
+    this.processEvent('Warning', this.state.primaryData.Warnings);
+    this.processEvent('Alarm', this.state.primaryData.Alarms);
+  };
 
-    if (this.state.primaryData.Warnings !== 0) {
-      this.setState(prevState => ({
-        eventLog: [
-          ...prevState.eventLog,
-          {
-            date: prevState.primaryData.Localtime,
-            type: 'Warning',
-            status: prevState.primaryData.Warnings
-          }
-        ]
-      }));
+  onResetEventLogs = e => {
+    e.preventDefault();
 
-      this.setState(prevState => ({
-        eventLog: [
-          ...prevState.eventLog,
-          {
-            date: prevState.primaryData.Localtime,
-            type: 'Operating',
-            status: prevState.primaryData.OpStatus
-          },
-          {
-            date: prevState.primaryData.Localtime,
-            type: 'Contactor',
-            status: prevState.primaryData.RlyStatus
-          }
-        ]
-      }));
-    }
-  }
+    this.setState({
+      eventLog: [
+        {
+          date: this.state.primaryData.Localtime,
+          type: 'Alarm',
+          status: this.state.primaryData.Alarms
+        },
+        {
+          date: this.state.primaryData.Localtime,
+          type: 'Warning',
+          status: this.state.primaryData.Warnings
+        },
+        {
+          date: this.state.primaryData.Localtime,
+          type: 'Operating',
+          status: this.state.primaryData.OpStatus
+        },
+        {
+          date: this.state.primaryData.Localtime,
+          type: 'Contactor',
+          status: this.state.primaryData.RlyStatus
+        }
+      ]
+    });
+  };
 
   getDataById = systemId => {
     const metaDataPromise = agent.fetchData.metaDataById(systemId);
     const primaryDataPromise = agent.fetchData.lastPrimaryDataById(systemId);
     const canMappingPromise = agent.fetchData.listOfCanMapping(systemId);
 
+    this.setState({ loading: true });
     Promise.all([metaDataPromise, primaryDataPromise, canMappingPromise]).then(
       responses => {
         const { IsOnline, BMSHWRSN } = responses[0].metaData;
@@ -137,6 +157,7 @@ class DefaultLayout extends Component {
         } = responses[0].metaData.Cluster;
 
         this.setState(prevState => ({
+          loading: false,
           isSystemOnline: IsOnline,
           systemId: BMSHWRSN,
           metaData: {
@@ -149,7 +170,8 @@ class DefaultLayout extends Component {
           canMapping: [...responses[2].canMapping]
         }));
 
-        this.addEventLog();
+        this.processEventLog();
+
         getWSService().addMessageListener(
           this.state.systemId,
           this.dashboardMessageHandler
@@ -159,6 +181,7 @@ class DefaultLayout extends Component {
   };
 
   getListOfSystems = () => {
+    this.setState({ loading: true });
     agent.fetchData.listOfSystems().then(({ systems }) => {
       this.setState({ systems });
       if (this.state.systems.length > 0) {
@@ -175,7 +198,7 @@ class DefaultLayout extends Component {
     return (
       <div className='app'>
         <AppHeader fixed>
-          <Suspense fallback={this.loading()}>
+          <Suspense fallback={this.onLoading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} />
           </Suspense>
         </AppHeader>
@@ -183,7 +206,7 @@ class DefaultLayout extends Component {
           <main className='main'>
             <AppBreadcrumb appRoutes={routes} router={router} />
             <Container fluid>
-              <Suspense fallback={this.loading()}>
+              <Suspense fallback={this.onLoading()}>
                 <Switch>
                   {routes.map((route, idx) => {
                     return route.component ? (
@@ -192,15 +215,24 @@ class DefaultLayout extends Component {
                         path={route.path}
                         exact={route.exact}
                         name={route.name}
-                        render={() => (
-                          <route.component
-                            isSystemOnline={this.state.isSystemOnline}
-                            systemId={this.state.systemId}
-                            primaryData={this.state.primaryData}
-                            canMapping={this.state.canMapping}
-                            eventLog={this.state.eventLog}
-                          />
-                        )}
+                        render={() => {
+                          console.log(
+                            'this.state.eventLog:',
+                            this.state.eventLog
+                          );
+                          return (
+                            <route.component
+                              loading={this.state.loading}
+                              onLoading={e => this.onLoading()}
+                              isSystemOnline={this.state.isSystemOnline}
+                              systemId={this.state.systemId}
+                              primaryData={this.state.primaryData}
+                              canMapping={this.state.canMapping}
+                              eventLog={this.state.eventLog}
+                              onResetEventLogs={e => this.onResetEventLogs(e)}
+                            />
+                          );
+                        }}
                       />
                     ) : null;
                   })}
@@ -211,17 +243,17 @@ class DefaultLayout extends Component {
           </main>
 
           <AppAside fixed fixed display='lg'>
-            <Suspense fallback={this.loading()}>
-              <DefaultAside
-                systems={this.state.systems}
-                metaData={this.state.metaData}
-                onChangeSystem={e => this.changeSystem(e)}
-              />
-            </Suspense>
+            <DefaultAside
+              loading={this.state.loading}
+              systems={this.state.systems}
+              metaData={this.state.metaData}
+              onChangeSystem={e => this.changeSystem(e)}
+              onLoading={e => this.onLoading()}
+            />
           </AppAside>
         </div>
         <AppFooter>
-          <Suspense fallback={this.loading()}>
+          <Suspense fallback={this.onLoading()}>
             <DefaultFooter />
           </Suspense>
         </AppFooter>

@@ -115,28 +115,7 @@ class DefaultLayout extends Component {
     e.preventDefault();
 
     this.setState({
-      eventLog: [
-        {
-          date: this.state.primaryData.Localtime,
-          type: 'Alarm',
-          status: this.state.primaryData.Alarms
-        },
-        {
-          date: this.state.primaryData.Localtime,
-          type: 'Warning',
-          status: this.state.primaryData.Warnings
-        },
-        {
-          date: this.state.primaryData.Localtime,
-          type: 'Operating',
-          status: this.state.primaryData.OpStatus
-        },
-        {
-          date: this.state.primaryData.Localtime,
-          type: 'Contactor',
-          status: this.state.primaryData.RlyStatus
-        }
-      ]
+      eventLog: []
     });
   };
 

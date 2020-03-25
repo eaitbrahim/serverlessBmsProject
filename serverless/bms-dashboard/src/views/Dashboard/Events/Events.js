@@ -93,6 +93,7 @@ const Events = props => {
           color='primary'
           className='float-right'
           onClick={e => props.onResetEventLogs(e)}
+          disabled={!props.isSystemOnline}
         >
           <i className='icon-refresh'></i> Reset
         </Button>

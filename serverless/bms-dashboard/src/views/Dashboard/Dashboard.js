@@ -137,6 +137,7 @@ const Dashboard = props => {
       <Row>
         <Col xs='6' sm='6' lg='12'>
           <Events
+            isSystemOnline={props.isSystemOnline}
             eventLogList={constructEventLogs(props.eventLog)}
             onResetEventLogs={e => props.onResetEventLogs(e)}
           />

@@ -26,9 +26,9 @@ exports.handler = async event => {
 
     await Dynamo.write(data, process.env.tableNameCanMapping);
 
-    return Responses._200({ message: `disconnected` });
+    return Responses._200({ message: `can mapping is done` });
   } catch (error) {
     console.log('Error: ', error);
-    return Responses._400({ message: 'disconnection could not be updated' });
+    return Responses._400({ message: 'can mapping could not be updated' });
   }
 };

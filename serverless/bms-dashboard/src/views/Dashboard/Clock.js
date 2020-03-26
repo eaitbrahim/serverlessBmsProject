@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card, CardBody } from 'reactstrap';
+import moment from 'moment';
 
 class Clock extends Component {
   constructor(props) {
@@ -26,7 +27,9 @@ class Clock extends Component {
     return (
       <Card className='text-white bg-warning'>
         <CardBody>
-          <div className='small text-value'>Current time {this.state.time}</div>
+          <div className='small text-value'>
+            Current time {moment(this.state.time).format('YYYY-MM-DD HH:mm:ss')}
+          </div>
         </CardBody>
       </Card>
     );

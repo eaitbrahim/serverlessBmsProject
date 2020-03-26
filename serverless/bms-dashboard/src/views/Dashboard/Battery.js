@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardBody, Col, ListGroup, ListGroupItem } from 'reactstrap';
+import { Card, CardBody, Table, Badge } from 'reactstrap';
 
 const Battery = props => {
   return (
@@ -8,51 +8,68 @@ const Battery = props => {
         {props.loading ? (
           props.onLoading()
         ) : (
-          <>
-            <Col xs='12' sm='6' lg='6'></Col>
-            <Col xs='12' sm='6' lg='6'>
-              <ListGroup className='list-group-accent' tag={'div'}>
-                <ListGroupItem action tag='a'>
+          <Table
+            hover
+            responsive
+            className='table-outline mb-0 d-none d-sm-table'
+          >
+            <tbody>
+              <tr>
+                <td>
+                  <div>{props.SOC} %</div>
+                  <div className='battery'>
+                    <div
+                      className={`battery-level ${props.class}`}
+                      style={{
+                        height: props.SOC > 100 ? '100%' : `${props.SOC}%`
+                      }}
+                    ></div>
+                  </div>
                   <div>
+                    <Badge color={props.color}>{props.message}</Badge>
+                  </div>
+                </td>
+                <td>
+                  <p>
                     <small className='text-muted mr-3'>
                       <strong>Battery Voltage:</strong>
-                      {props.VBattery}
+                      {props.VBattery + ' ' + props.VBatteryUnit}
                     </small>
-                  </div>
-                  <div>
+                  </p>
+                  <p>
                     <small className='text-muted mr-3'>
                       <strong>Battery Current:</strong>
-                      {props.IBattery}
+                      {props.IBattery + ' ' + props.IBatteryUnit}
                     </small>
-                  </div>
-                  <div>
+                  </p>
+                  <p>
                     <small className='text-muted mr-3'>
                       <strong>Max Charge Current:</strong>
-                      {props.IChgLimit}
+                      {props.IChgLimit + ' ' + props.IChgLimitUnit}
                     </small>
-                  </div>
-                  <div>
+                  </p>
+                  <p>
                     <small className='text-muted mr-3'>
                       <strong>Max Discharge Current:</strong>
-                      {props.IDsgLimit}
+                      {props.IDsgLimit + ' ' + props.IDsgLimitUnit}
                     </small>
-                  </div>
-                  <div>
+                  </p>
+                  <p>
                     <small className='text-muted mr-3'>
                       <strong>Operating State:</strong>
-                      {props.OpStatus}
+                      {props.OpStatus + ' ' + props.OpStatusUnit}
                     </small>
-                  </div>
-                  <div>
+                  </p>
+                  <p>
                     <small className='text-muted mr-3'>
                       <strong>Contactor State:</strong>
-                      {props.RlyStatus}
+                      {props.RlyStatus + ' ' + props.RlyStatusUnit}
                     </small>
-                  </div>
-                </ListGroupItem>
-              </ListGroup>
-            </Col>
-          </>
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </Table>
         )}
       </CardBody>
     </Card>

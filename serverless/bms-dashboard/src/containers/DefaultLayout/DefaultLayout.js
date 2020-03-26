@@ -19,10 +19,10 @@ const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
   eventLog = {
-    Alarm: { reset: false, events: [] },
-    Warning: { reset: false, events: [] },
-    Operating: { reset: false, events: [] },
-    Contactor: { reset: false, events: [] }
+    alarms: { reset: false, events: [] },
+    warnings: { reset: false, events: [] },
+    operatings: { reset: false, events: [] },
+    contactors: { reset: false, events: [] }
   };
   state = {
     loading: false,
@@ -30,6 +30,12 @@ class DefaultLayout extends Component {
     systemId: '',
     systems: [],
     canMapping: [],
+    events: {
+      alarms: { reset: false, events: [] },
+      warnings: { reset: false, events: [] },
+      operatings: { reset: false, events: [] },
+      contactors: { reset: false, events: [] }
+    },
     metaData: {
       identification: [],
       canInfo: [],
@@ -66,15 +72,21 @@ class DefaultLayout extends Component {
 
   changeSystem = s => {
     this.eventLog = {
-      Alarm: { reset: false, events: [] },
-      Warning: { reset: false, events: [] },
-      Operating: { reset: false, events: [] },
-      Contactor: { reset: false, events: [] }
+      alarms: { reset: false, events: [] },
+      warnings: { reset: false, events: [] },
+      operatings: { reset: false, events: [] },
+      contactors: { reset: false, events: [] }
     };
     this.setState({
       isSystemOnline: false,
       systemId: '',
       canMapping: [],
+      events: {
+        alarms: { reset: false, events: [] },
+        warnings: { reset: false, events: [] },
+        operatings: { reset: false, events: [] },
+        contactors: { reset: false, events: [] }
+      },
       metaData: {
         identification: [],
         canInfo: [],
@@ -86,60 +98,74 @@ class DefaultLayout extends Component {
     this.getDataById(s);
   };
 
-  processEvent = (eventObj, status) => {
+  addEvent = (eventObj, status, date, type) => {
     if (eventObj.events.length === 0) {
       eventObj.events.push({
-        reset: false,
-        events: [
-          {
-            direction: 'Occured',
-            date: this.state.primaryData.Localtime,
-            status
-          }
-        ]
+        direction: 'Occured',
+        date,
+        status,
+        type
       });
     } else if (status !== eventObj.events[0].status) {
       if (eventObj.reset) {
-        eventObj.push({
-          reset: false,
-          events: [
-            {
-              direction: 'Occured',
-              date: this.state.primaryData.Localtime,
-              status
-            }
-          ]
-        });
+        eventObj.reset = false;
+        eventObj.events = [
+          {
+            direction: 'Occured',
+            date,
+            status,
+            type
+          }
+        ];
       } else {
         eventObj.events[0].direction = 'Left';
         eventObj.events.unshift({
           direction: 'Occured',
-          date: this.state.primaryData.Localtime,
-          status
+          date,
+          status,
+          type
         });
       }
     }
-    console.log('state:', this.eventLog.Alaram);
   };
   processEventLog = () => {
-    this.processEvent(this.eventLog.Operating, this.state.primaryData.OpStatus);
-    this.processEvent(
-      this.eventLog.Contactor,
-      this.state.primaryData.RlyStatus
+    this.addEvent(
+      this.eventLog.operatings,
+      this.state.primaryData.OpStatus,
+      this.state.primaryData.Localtime,
+      'Operating'
     );
-    this.processEvent(this.eventLog.Warning, this.state.primaryData.Warnings);
-    this.processEvent(this.eventLog.Alarm, this.state.primaryData.Alarms);
+    this.addEvent(
+      this.eventLog.contactors,
+      this.state.primaryData.RlyStatus,
+      this.state.primaryData.Localtime,
+      'Contactor'
+    );
+    this.addEvent(
+      this.eventLog.warnings,
+      this.state.primaryData.Warnings,
+      this.state.primaryData.Localtime,
+      'Warning'
+    );
+    this.addEvent(
+      this.eventLog.alarms,
+      this.state.primaryData.Alarms,
+      this.state.primaryData.Localtime,
+      'Alarm'
+    );
+
+    this.setState({ events: this.eventLog });
   };
 
   onResetEventLogs = e => {
     e.preventDefault();
 
-    this.eventLog = {
-      Alarm: { reset: true },
-      Warning: { reset: true },
-      Operating: { reset: true },
-      Contactor: { reset: true }
-    };
+    this.eventLog.alarms.reset = true;
+    this.eventLog.warnings.reset = true;
+    this.eventLog.operatings.reset = true;
+    this.eventLog.contactors.reset = true;
+
+    this.processEventLog();
   };
 
   getDataById = systemId => {
@@ -225,7 +251,7 @@ class DefaultLayout extends Component {
                             systemId={this.state.systemId}
                             primaryData={this.state.primaryData}
                             canMapping={this.state.canMapping}
-                            eventLog={this.eventLog}
+                            eventLog={this.state.events}
                             onResetEventLogs={e => this.onResetEventLogs(e)}
                           />
                         )}

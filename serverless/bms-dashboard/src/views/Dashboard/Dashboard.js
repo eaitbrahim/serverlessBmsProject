@@ -36,7 +36,7 @@ const Dashboard = props => {
   return (
     <div className='animated fadeIn'>
       <Row>
-        <Col xs='12' sm='6' lg='3'>
+        <Col xs='12' sm='6' lg='4'>
           <IsOnline
             isSystemOnline={props.isSystemOnline}
             systemId={props.systemId}
@@ -45,7 +45,7 @@ const Dashboard = props => {
           />
         </Col>
 
-        <Col xs='12' sm='6' lg='5'>
+        <Col xs='12' sm='6' lg='4'>
           <LastTime
             lastDateTime={props.primaryData ? props.primaryData.Localtime : ''}
             loading={props.loading}
@@ -72,12 +72,40 @@ const Dashboard = props => {
         </Col>
         <Col xs='12' sm='6' lg='4'>
           <Battery
+            class={
+              props.primaryData.Alarms > 0
+                ? 'alert'
+                : props.primaryData.Warnings > 0
+                ? 'warn'
+                : ''
+            }
+            message={
+              props.primaryData.Alarms > 0
+                ? 'Alarm'
+                : props.primaryData.Warnings > 0
+                ? 'Warning'
+                : 'Battery OK'
+            }
+            color={
+              props.primaryData.Alarms > 0
+                ? 'danger'
+                : props.primaryData.Warnings > 0
+                ? 'warning'
+                : 'success'
+            }
+            SOC={props.primaryData.SOC}
             VBattery={props.primaryData.VBattery}
+            VBatteryUnit={getUnitFromCanMapping('VBattery')}
             IBattery={props.primaryData.IBattery}
+            IBatteryUnit={getUnitFromCanMapping('IBattery')}
             IChgLimit={props.primaryData.IChgLimit}
+            IChgLimitUnit={getUnitFromCanMapping('IChgLimit')}
             IDsgLimit={props.primaryData.IDsgLimit}
+            IDsgLimitUnit={getUnitFromCanMapping('IDsgLimit')}
             OpStatus={props.primaryData.OpStatus}
+            OpStatusUnit={getUnitFromCanMapping('OpStatus')}
             RlyStatus={props.primaryData.RlyStatus}
+            RlyStatusUnit={getUnitFromCanMapping('RlyStatus')}
             loading={props.loading}
             onLoading={e => props.onLoading()}
           />

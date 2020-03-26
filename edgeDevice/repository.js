@@ -43,6 +43,79 @@ class Repository {
     );
   }
 
+  createPrimaryData(primaryData) {
+    console.log('create data...');
+    const dataToInsert = primaryData.map(p => {
+      return `(
+      '${p.Localtime}', 
+      ${p.HB1}, 
+      ${p.SOC},
+      ${p.SOCMax},
+      ${p.SOCMin},
+      ${p.IChgLimit},
+      ${p.IDsgLimit},
+      ${p.HB2},
+      ${p.SOH},
+      ${p.SOHMax},
+      ${p.SOHMin},
+      ${p.OpStatus},
+      ${p.RlyStatus},
+      ${p.VBattery},
+      ${p.IBattery},
+      ${p.VCellMin},
+      ${p.VCellMinID},
+      ${p.VCellMax},
+      ${p.VCellMaxID},
+      ${p.TModMin},
+      ${p.TModAvg},
+      ${p.TModMax},
+      ${p.TModMinID},
+      ${p.TModMaxID},
+      ${p.HIBattery},
+      ${p.reserved},
+      ${p.Alarms},
+      ${p.Warnings},
+      '${p.CreatedAt}',
+      '${p.SystemId}'
+      )`;
+    });
+
+    return this.dao.run(
+      `INSERT INTO PrimaryData (
+        Localtime,
+        HB1,
+        SOC,
+        SOCMax,
+        SOCMin,
+        IChgLimit,
+        IDsgLimit,
+        HB2,
+        SOH,
+        SOHMax,
+        SOHMin,
+        OpStatus,
+        RlyStatus,
+        VBattery,
+        IBattery,
+        VCellMin,
+        VCellMinID,
+        VCellMax,
+        VCellMaxID,
+        TModMin,
+        TModAvg,
+        TModMax,
+        TModMinID,
+        TModMaxID,
+        HIBattery,
+        reserved,
+        Alarms,
+        Warnings,
+        CreatedAt,
+        SystemId) VALUES ${dataToInsert.join(',')}`,
+      []
+    );
+  }
+
   updateSyncLog(syncLog) {
     console.log('Updating logs...');
     const {

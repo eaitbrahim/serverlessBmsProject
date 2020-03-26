@@ -124,7 +124,6 @@ class DefaultAside extends Component {
               <ListGroupItem
                 action
                 tag='a'
-                href='#'
                 className='list-group-item-accent-primary list-group-item-divider'
               >
                 {this.props.loading
@@ -143,7 +142,6 @@ class DefaultAside extends Component {
               <ListGroupItem
                 action
                 tag='a'
-                href='#'
                 className='list-group-item-accent-success list-group-item-divider'
               >
                 {this.props.loading
@@ -156,7 +154,6 @@ class DefaultAside extends Component {
               <ListGroupItem
                 action
                 tag='a'
-                href='#'
                 className='list-group-item-accent-info list-group-item-divider'
               >
                 {this.props.loading

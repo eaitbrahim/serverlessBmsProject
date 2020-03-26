@@ -31,20 +31,6 @@ const Events = props => {
     return <Badge color={color}>{typeText}</Badge>;
   };
 
-  const getMessage = (bit, type) => {
-    let result = '';
-    let data = getData(bit, type);
-
-    if (typeof data !== 'undefined') {
-      if (type !== 'Alarm' && type !== 'Warning') {
-        result = type + ' State ' + data.definition;
-      } else {
-        result = data.definition;
-      }
-    }
-    return result;
-  };
-
   const getData = (bit, type) => {
     let data;
     if (type === 'Alarm') {
@@ -73,14 +59,53 @@ const Events = props => {
     return data;
   };
 
-  const buildEventRows = () => {
-    const dataRows = props.eventLogList.map(event => ({
-      date: event.date,
-      badge: getBadge(event.type),
-      message: getMessage(event.bit, event.type)
-    }));
+  const getEvents = type => {
+    console.log('props.eventLog:', props.eventLog);
+    if (
+      typeof props.eventLog[type] !== 'undefined' &&
+      !props.eventLog[type].reset
+    ) {
+      return props.eventLog[type].events;
+    }
+    return [];
+  };
 
-    const filteredDataRow = dataRows.filter(dr => dr.message !== 'NA');
+  const getBinary = events => {
+    for (let event of events) {
+      let statusList = props.toBinary(event.status);
+      statusList.forEach((status, index) => {
+        if (status === 1) {
+          event.bit = index + 1;
+        }
+      });
+    }
+  };
+
+  const getMessage = events => {
+    for (let event of events) {
+      let data = getData(event.bit, event.type);
+
+      if (typeof data !== 'undefined') {
+        if (event.type !== 'Alarm' && event.type !== 'Warning') {
+          event.message = event.type + ' State ' + data.definition;
+        } else {
+          event.message = data.definition;
+        }
+      }
+    }
+  };
+
+  const buildEventRows = () => {
+    const alarmEvents = getEvents('Alarm');
+    getBinary(alarmEvents);
+    getMessage(alarmEvents);
+
+    const warningEvents = getEvents('Warning');
+    getBinary(warningEvents);
+    getMessage(warningEvents);
+
+    const allEvents = [...alarmEvents, ...warningEvents];
+    const filteredDataRow = allEvents.filter(dr => dr.message !== 'NA');
     return filteredDataRow.map((data, index) => (
       <EventRow key={index} dataRow={data} />
     ));
@@ -115,6 +140,7 @@ const Events = props => {
       </Table>
     </div>
   );
+
   return (
     <Card>
       <CardBody>

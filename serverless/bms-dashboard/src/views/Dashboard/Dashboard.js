@@ -5,6 +5,7 @@ import IsOnline from './IsOnline';
 import LastTime from './LastTime';
 import Clock from './Clock';
 import SocSoh from './SocSoh';
+import Battery from './Battery';
 import TemperatureVoltage from './TemperatureVoltage';
 import Alarms from './Alarms/Alarms';
 import Warnings from './Warnings/Warnings';
@@ -30,31 +31,6 @@ const Dashboard = props => {
     }
 
     return result;
-  };
-
-  const constructEventLogs = events => {
-    let eventLogList = [];
-    for (let event of events) {
-      if (event.type === 'Alarm' || event.type === 'Warning') {
-        let statusList = toBinary(event.status);
-        statusList.forEach((status, index) => {
-          if (status === 1) {
-            eventLogList.push({
-              date: event.date,
-              type: event.type,
-              bit: index + 1
-            });
-          }
-        });
-      } else {
-        eventLogList.push({
-          date: event.date,
-          type: event.type,
-          bit: event.status
-        });
-      }
-    }
-    return eventLogList;
   };
 
   return (
@@ -83,7 +59,7 @@ const Dashboard = props => {
       </Row>
 
       <Row>
-        <Col xs='6' sm='6' lg='6'>
+        <Col xs='12' sm='6' lg='4'>
           <SocSoh
             series={[props.primaryData.SOC, props.primaryData.SOH]}
             socMin={props.primaryData.SOCMin}
@@ -94,7 +70,19 @@ const Dashboard = props => {
             onLoading={e => props.onLoading()}
           />
         </Col>
-        <Col xs='6' sm='6' lg='6'>
+        <Col xs='12' sm='6' lg='4'>
+          <Battery
+            VBattery={props.primaryData.VBattery}
+            IBattery={props.primaryData.IBattery}
+            IChgLimit={props.primaryData.IChgLimit}
+            IDsgLimit={props.primaryData.IDsgLimit}
+            OpStatus={props.primaryData.OpStatus}
+            RlyStatus={props.primaryData.RlyStatus}
+            loading={props.loading}
+            onLoading={e => props.onLoading()}
+          />
+        </Col>
+        <Col xs='12' sm='6' lg='4'>
           <TemperatureVoltage
             TModMax={props.primaryData.TModMax}
             TModMaxUnit={getUnitFromCanMapping('TModMax')}
@@ -138,8 +126,9 @@ const Dashboard = props => {
         <Col xs='6' sm='6' lg='12'>
           <Events
             isSystemOnline={props.isSystemOnline}
-            eventLogList={constructEventLogs(props.eventLog)}
+            eventLog={props.eventLog}
             onResetEventLogs={e => props.onResetEventLogs(e)}
+            toBinary={i => toBinary(i)}
           />
         </Col>
       </Row>

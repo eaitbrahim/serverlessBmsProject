@@ -18,13 +18,18 @@ const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
+  eventLog = {
+    Alarm: { reset: false, events: [] },
+    Warning: { reset: false, events: [] },
+    Operating: { reset: false, events: [] },
+    Contactor: { reset: false, events: [] }
+  };
   state = {
     loading: false,
     isSystemOnline: false,
     systemId: '',
     systems: [],
     canMapping: [],
-    eventLog: [],
     metaData: {
       identification: [],
       canInfo: [],
@@ -60,11 +65,16 @@ class DefaultLayout extends Component {
   };
 
   changeSystem = s => {
+    this.eventLog = {
+      Alarm: { reset: false, events: [] },
+      Warning: { reset: false, events: [] },
+      Operating: { reset: false, events: [] },
+      Contactor: { reset: false, events: [] }
+    };
     this.setState({
       isSystemOnline: false,
       systemId: '',
       canMapping: [],
-      eventLog: [],
       metaData: {
         identification: [],
         canInfo: [],
@@ -76,47 +86,60 @@ class DefaultLayout extends Component {
     this.getDataById(s);
   };
 
-  addEventLog = (type, status) => {
-    console.log('addEventLog:', type);
-    this.setState(prevState => ({
-      eventLog: [
-        {
-          date: prevState.primaryData.Localtime,
-          type,
+  processEvent = (eventObj, status) => {
+    if (eventObj.events.length === 0) {
+      eventObj.events.push({
+        reset: false,
+        events: [
+          {
+            direction: 'Occured',
+            date: this.state.primaryData.Localtime,
+            status
+          }
+        ]
+      });
+    } else if (status !== eventObj.events[0].status) {
+      if (eventObj.reset) {
+        eventObj.push({
+          reset: false,
+          events: [
+            {
+              direction: 'Occured',
+              date: this.state.primaryData.Localtime,
+              status
+            }
+          ]
+        });
+      } else {
+        eventObj.events[0].direction = 'Left';
+        eventObj.events.unshift({
+          direction: 'Occured',
+          date: this.state.primaryData.Localtime,
           status
-        },
-        ...prevState.eventLog
-      ]
-    }));
-    console.log('Added:', this.state.eventLog);
-  };
-
-  processEvent = (type, status) => {
-    const filteredArrays = this.state.eventLog.filter(
-      event => event.type === type
-    );
-    console.log('filteredArrays:', filteredArrays);
-    if (filteredArrays.length === 0) {
-      console.log('processEvent:', type);
-      this.addEventLog(type, status);
-    } else if (filteredArrays[0].status !== status) {
-      this.addEventLog(type, status);
+        });
+      }
     }
+    console.log('state:', this.eventLog.Alaram);
   };
   processEventLog = () => {
-    console.log('processEventLog');
-    this.processEvent('Operating', this.state.primaryData.OpStatus);
-    this.processEvent('Contactor', this.state.primaryData.RlyStatus);
-    this.processEvent('Warning', this.state.primaryData.Warnings);
-    this.processEvent('Alarm', this.state.primaryData.Alarms);
+    this.processEvent(this.eventLog.Operating, this.state.primaryData.OpStatus);
+    this.processEvent(
+      this.eventLog.Contactor,
+      this.state.primaryData.RlyStatus
+    );
+    this.processEvent(this.eventLog.Warning, this.state.primaryData.Warnings);
+    this.processEvent(this.eventLog.Alarm, this.state.primaryData.Alarms);
   };
 
   onResetEventLogs = e => {
     e.preventDefault();
 
-    this.setState({
-      eventLog: []
-    });
+    this.eventLog = {
+      Alarm: { reset: true },
+      Warning: { reset: true },
+      Operating: { reset: true },
+      Contactor: { reset: true }
+    };
   };
 
   getDataById = systemId => {
@@ -194,24 +217,18 @@ class DefaultLayout extends Component {
                         path={route.path}
                         exact={route.exact}
                         name={route.name}
-                        render={() => {
-                          console.log(
-                            'this.state.eventLog:',
-                            this.state.eventLog
-                          );
-                          return (
-                            <route.component
-                              loading={this.state.loading}
-                              onLoading={e => this.onLoading()}
-                              isSystemOnline={this.state.isSystemOnline}
-                              systemId={this.state.systemId}
-                              primaryData={this.state.primaryData}
-                              canMapping={this.state.canMapping}
-                              eventLog={this.state.eventLog}
-                              onResetEventLogs={e => this.onResetEventLogs(e)}
-                            />
-                          );
-                        }}
+                        render={() => (
+                          <route.component
+                            loading={this.state.loading}
+                            onLoading={e => this.onLoading()}
+                            isSystemOnline={this.state.isSystemOnline}
+                            systemId={this.state.systemId}
+                            primaryData={this.state.primaryData}
+                            canMapping={this.state.canMapping}
+                            eventLog={this.eventLog}
+                            onResetEventLogs={e => this.onResetEventLogs(e)}
+                          />
+                        )}
                       />
                     ) : null;
                   })}

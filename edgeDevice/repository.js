@@ -4,17 +4,14 @@ class Repository {
   }
 
   getMetaData() {
-    console.log('Reading meta data...');
     return this.dao.all(`SELECT * FROM MetaData`, []);
   }
 
   getCanMapping() {
-    console.log('Reading can mapping...');
     return this.dao.all(`SELECT * FROM CANMapping`, []);
   }
 
   getNewPrimaryData() {
-    console.log('Reading primary data...');
     return this.dao.all(
       `SELECT * FROM PrimaryData WHERE Id NOT IN (SELECT PrimaryDataId FROM SyncLog)`,
       []
@@ -22,7 +19,6 @@ class Repository {
   }
 
   createSyncLog(syncLog) {
-    console.log('Creating logs...');
     const {
       BMSHWRSN,
       SyncDate,
@@ -117,7 +113,6 @@ class Repository {
   }
 
   updateSyncLog(syncLog) {
-    console.log('Updating logs...');
     const {
       BMSHWRSN,
       SyncDate,

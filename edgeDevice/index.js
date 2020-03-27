@@ -48,11 +48,11 @@ system.getMetaData().then(metaData => {
       });
 
       // Send primary data on interval
+      console.log(`Sending primary data to the server...`);
       let primaryDataInterval = setInterval(() => {
         system.getPrimaryData(BMSHWRSN).then(({ primaryData }) => {
           primaryData.forEach(pd => {
             pd.action = 'primary-data';
-            console.log(`Sending primary data to the server.`);
             ws.send(JSON.stringify(pd));
           });
         });
@@ -64,7 +64,6 @@ system.getMetaData().then(metaData => {
 
       // Receive data from server
       ws.on('message', function incoming(data) {
-        console.log('Received Data: ', data);
         system.setProcessedData(JSON.parse(data));
       });
     });

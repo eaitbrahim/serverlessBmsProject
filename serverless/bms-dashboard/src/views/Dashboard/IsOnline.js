@@ -12,9 +12,11 @@ const IsOnline = props => {
         props.onLoading()
       ) : (
         <CardBody>
-          <div className='small text-value'>
-            <strong>{props.systemId}</strong> is
-            {props.isSystemOnline ? ' On Line' : ' Off Line'}
+          <div className='text-value'>
+            <small>
+              {props.systemId} is
+              {props.isSystemOnline ? ' On Line' : ' Off Line'}
+            </small>
           </div>
         </CardBody>
       )}

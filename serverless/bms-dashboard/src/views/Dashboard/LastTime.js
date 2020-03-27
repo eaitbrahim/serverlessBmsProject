@@ -8,11 +8,13 @@ const LastTime = props => {
         props.onLoading()
       ) : (
         <CardBody>
-          <div className='small text-value'>
-            {typeof props.lastDateTime !== 'undefined' &&
-            props.lastDateTime !== ''
-              ? `Last sample received at ${props.lastDateTime}`
-              : `No primary data received so far!`}
+          <div className='text-value'>
+            <small>
+              {typeof props.lastDateTime !== 'undefined' &&
+              props.lastDateTime !== ''
+                ? `Last sample received at ${props.lastDateTime}`
+                : `No primary data received so far!`}
+            </small>
           </div>
         </CardBody>
       )}

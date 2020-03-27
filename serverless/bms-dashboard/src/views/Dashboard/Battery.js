@@ -15,7 +15,7 @@ const Battery = props => {
           >
             <tbody>
               <tr>
-                <td>
+                <td className='text-center'>
                   <div>{props.SOC} %</div>
                   <div className='battery'>
                     <div

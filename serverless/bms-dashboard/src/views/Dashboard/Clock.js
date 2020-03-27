@@ -27,8 +27,11 @@ class Clock extends Component {
     return (
       <Card className='text-white bg-warning'>
         <CardBody>
-          <div className='small text-value'>
-            Current time {moment(this.state.time).format('YYYY-MM-DD HH:mm:ss')}
+          <div className='text-value'>
+            <small>
+              Current date & time{' '}
+              {moment(this.state.time).format('YYYY-MM-DD HH:mm:ss')}
+            </small>
           </div>
         </CardBody>
       </Card>

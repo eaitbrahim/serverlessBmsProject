@@ -23,7 +23,9 @@ const TemperatureVoltage = props => {
             <tbody>
               <tr>
                 <td>
-                  <strong>Battery Temperature</strong>
+                  <small className='text-muted mr-3'>
+                    <strong>Battery Temperature</strong>
+                  </small>
                 </td>
                 <td className='text-center'>
                   {props.TModMax} {props.TModMaxUnit}
@@ -36,7 +38,9 @@ const TemperatureVoltage = props => {
               </tr>
               <tr>
                 <td>
-                  <strong>Sensor Index</strong>
+                  <small className='text-muted mr-3'>
+                    <strong>Sensor Index</strong>
+                  </small>
                 </td>
                 <td className='text-center'>{props.TModMaxID}</td>
                 <td>
@@ -45,7 +49,9 @@ const TemperatureVoltage = props => {
               </tr>
               <tr>
                 <td>
-                  <strong>Cell Voltage</strong>
+                  <small className='text-muted mr-3'>
+                    <strong>Cell Voltage</strong>
+                  </small>
                 </td>
                 <td className='text-center'>
                   {props.VCellMax} {props.VCellMaxUnit}
@@ -58,7 +64,9 @@ const TemperatureVoltage = props => {
               </tr>
               <tr>
                 <td>
-                  <strong>Cell Index</strong>
+                  <small className='text-muted mr-3'>
+                    <strong>Cell Index</strong>
+                  </small>
                 </td>
                 <td className='text-center'>{props.VCellMaxID}</td>
                 <td>

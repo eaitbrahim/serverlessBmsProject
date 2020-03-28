@@ -58,23 +58,6 @@ const Events = props => {
     return data;
   };
 
-  const getBinary = events => {
-    let eventsWithBinary = [];
-    for (let event of events) {
-      if (event.type !== 'Alarm' && event.type !== 'Warning') {
-        eventsWithBinary.push({ ...event, bit: event.status });
-      } else {
-        let statusList = props.toBinary(event.status);
-        statusList.forEach((status, index) => {
-          if (status === 1) {
-            eventsWithBinary.push({ ...event, bit: index + 1 });
-          }
-        });
-      }
-    }
-    return eventsWithBinary;
-  };
-
   const getMessage = events => {
     let eventsWithMessage = [];
     for (let event of events) {
@@ -93,30 +76,10 @@ const Events = props => {
   };
 
   const buildEventRows = () => {
-    let alarmsWithMessage = [];
-    let warningsWithMessage = [];
-    let operatingsWithMessage = [];
-    let contactorsWithMessage = [];
-
-    if (!props.eventLog.alarms.reset) {
-      const alarmsWithBinary = getBinary(props.eventLog.alarms.events);
-      alarmsWithMessage = getMessage(alarmsWithBinary);
-    }
-
-    if (!props.eventLog.warnings.reset) {
-      const warningsWithBinary = getBinary(props.eventLog.warnings.events);
-      warningsWithMessage = getMessage(warningsWithBinary);
-    }
-
-    if (!props.eventLog.operatings.reset) {
-      const operatingsWithBinary = getBinary(props.eventLog.operatings.events);
-      operatingsWithMessage = getMessage(operatingsWithBinary);
-    }
-
-    if (!props.eventLog.contactors.reset) {
-      const contactorsWithBinary = getBinary(props.eventLog.contactors.events);
-      contactorsWithMessage = getMessage(contactorsWithBinary);
-    }
+    let alarmsWithMessage = getMessage(props.eventLog.Alarm);
+    let warningsWithMessage = getMessage(props.eventLog.Warning);
+    let operatingsWithMessage = getMessage(props.eventLog.Operating);
+    let contactorsWithMessage = getMessage(props.eventLog.Contactor);
 
     const allEvents = [
       ...alarmsWithMessage,
@@ -125,27 +88,32 @@ const Events = props => {
       ...contactorsWithMessage
     ];
     const filteredEventRow = allEvents.filter(
-      dr => dr.message !== 'NA (NA) - Occured'
+      dr =>
+        dr.message !== 'NA (NA) - Occured' &&
+        dr.message !== 'NA (NA) - Left' &&
+        dr.hide === false
     );
     return filteredEventRow.map((event, index) => (
       <EventRow key={index} dataRow={event} />
     ));
   };
 
-  const renderResetButton = () => (
-    <Row>
-      <Col sm='12' className='d-none d-sm-inline-block'>
-        <Button
-          color='primary'
-          className='float-right'
-          onClick={e => props.onResetEventLogs(e)}
-          disabled={!props.isSystemOnline}
-        >
-          <i className='icon-refresh'></i> Reset
-        </Button>
-      </Col>
-    </Row>
-  );
+  const renderButton = () => {
+    return (
+      <Row>
+        <Col sm='12' className='d-none d-sm-inline-block'>
+          <Button
+            color='primary'
+            className='float-right'
+            onClick={e => props.onHideEventLogs(e)}
+            disabled={!props.isSystemOnline}
+          >
+            <i className='icon-refresh'></i> Reset
+          </Button>
+        </Col>
+      </Row>
+    );
+  };
 
   const renderEventTable = () => (
     <div className='table-wrapper-scroll-y my-custom-scrollbar mt-3'>
@@ -165,7 +133,7 @@ const Events = props => {
   return (
     <Card>
       <CardBody>
-        {renderResetButton()}
+        {renderButton()}
         {renderEventTable()}
       </CardBody>
     </Card>

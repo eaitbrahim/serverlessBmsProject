@@ -155,7 +155,7 @@ const Dashboard = props => {
           <Events
             isSystemOnline={props.isSystemOnline}
             eventLog={props.eventLog}
-            onResetEventLogs={e => props.onResetEventLogs(e)}
+            onHideEventLogs={(e, hide) => props.onHideEventLogs(e)}
             toBinary={i => toBinary(i)}
           />
         </Col>

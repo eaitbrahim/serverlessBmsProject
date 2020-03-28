@@ -19,11 +19,12 @@ const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
   eventLog = {
-    alarms: { reset: false, events: [] },
-    warnings: { reset: false, events: [] },
-    operatings: { reset: false, events: [] },
-    contactors: { reset: false, events: [] }
+    Alarm: [],
+    Warning: [],
+    Operating: [],
+    Contactor: []
   };
+
   state = {
     loading: false,
     isSystemOnline: false,
@@ -31,10 +32,10 @@ class DefaultLayout extends Component {
     systems: [],
     canMapping: [],
     events: {
-      alarms: { reset: false, events: [] },
-      warnings: { reset: false, events: [] },
-      operatings: { reset: false, events: [] },
-      contactors: { reset: false, events: [] }
+      Alarm: [],
+      Warning: [],
+      Operating: [],
+      Contactor: []
     },
     metaData: {
       identification: [],
@@ -72,20 +73,21 @@ class DefaultLayout extends Component {
 
   changeSystem = s => {
     this.eventLog = {
-      alarms: { reset: false, events: [] },
-      warnings: { reset: false, events: [] },
-      operatings: { reset: false, events: [] },
-      contactors: { reset: false, events: [] }
+      Alarm: [],
+      Warning: [],
+      Operating: [],
+      Contactor: []
     };
     this.setState({
       isSystemOnline: false,
       systemId: '',
       canMapping: [],
       events: {
-        alarms: { reset: false, events: [] },
-        warnings: { reset: false, events: [] },
-        operatings: { reset: false, events: [] },
-        contactors: { reset: false, events: [] }
+        reset: false,
+        Alarm: [],
+        Warning: [],
+        Operating: [],
+        Contactor: []
       },
       metaData: {
         identification: [],
@@ -98,74 +100,125 @@ class DefaultLayout extends Component {
     this.getDataById(s);
   };
 
-  addEvent = (eventObj, status, date, type) => {
-    if (eventObj.events.length === 0) {
-      eventObj.events.push({
-        direction: 'Occured',
-        date,
-        status,
-        type
-      });
-    } else if (status !== eventObj.events[0].status) {
-      if (eventObj.reset) {
-        eventObj.reset = false;
-        eventObj.events = [
-          {
-            direction: 'Occured',
-            date,
-            status,
-            type
-          }
-        ];
-      } else {
-        eventObj.events[0].direction = 'Left';
-        eventObj.events.unshift({
+  addEvent = (status, date, type) => {
+    let bits = this.getBits(status, type);
+    if (this.eventLog[type].length === 0) {
+      bits.forEach(bit => {
+        this.eventLog[type].push({
           direction: 'Occured',
           date,
           status,
-          type
+          type,
+          bit,
+          hide: false
         });
-      }
+      });
+    } else {
+      this.eventLog[type].forEach(oldEvent => {
+        if (!bits.includes(oldEvent.bit)) {
+          oldEvent.direction = 'Left';
+          oldEvent.date = date;
+          oldEvent.hide = false;
+        }
+      });
+      bits.forEach(bit => {
+        const bitIndex = this.eventLog[type].findIndex(
+          event => event.bit === bit
+        );
+        if (bitIndex === -1) {
+          this.eventLog[type].unshift({
+            direction: 'Occured',
+            date,
+            status,
+            type,
+            bit,
+            hide: false
+          });
+        }
+      });
     }
   };
+
+  updateState = () => {
+    this.setState({
+      events: {
+        Alarm: [...this.eventLog.Alarm],
+        Warning: [...this.eventLog.Warning],
+        Operating: [...this.eventLog.Operating],
+        Contactor: [...this.eventLog.Contactor]
+      }
+    });
+  };
+
+  getBits = (status, type) => {
+    let bits = [];
+    if (type !== 'Alarm' && type !== 'Warning') {
+      bits.push(status);
+    } else {
+      let statusList = this.toBinary(status);
+      statusList.forEach((status, index) => {
+        if (status === 1) {
+          bits.push(index + 1);
+        }
+      });
+    }
+    return bits;
+  };
+
+  toBinary = integer => {
+    let result = [];
+    if (typeof integer !== 'undefined') {
+      let str = integer.toString(2);
+      result = str
+        .padStart(32, '0')
+        .split('')
+        .reverse()
+        .map(r => parseInt(r));
+    }
+
+    return result;
+  };
+
   processEventLog = () => {
     this.addEvent(
-      this.eventLog.operatings,
       this.state.primaryData.OpStatus,
       this.state.primaryData.Localtime,
       'Operating'
     );
     this.addEvent(
-      this.eventLog.contactors,
       this.state.primaryData.RlyStatus,
       this.state.primaryData.Localtime,
       'Contactor'
     );
     this.addEvent(
-      this.eventLog.warnings,
       this.state.primaryData.Warnings,
       this.state.primaryData.Localtime,
       'Warning'
     );
     this.addEvent(
-      this.eventLog.alarms,
       this.state.primaryData.Alarms,
       this.state.primaryData.Localtime,
       'Alarm'
     );
 
-    this.setState({ events: this.eventLog });
+    this.updateState();
   };
 
-  onResetEventLogs = e => {
+  onHideEventLogs = (e, hide) => {
     e.preventDefault();
 
-    this.eventLog.alarms.reset = true;
-    this.eventLog.warnings.reset = true;
-    this.eventLog.operatings.reset = true;
-    this.eventLog.contactors.reset = true;
+    this.hideEvents('Alarm', hide);
+    this.hideEvents('Warning', hide);
+    this.hideEvents('Operating', hide);
+    this.hideEvents('Contactor', hide);
 
-    this.processEventLog();
+    this.updateState();
+  };
+
+  hideEvents = type => {
+    for (let event of this.eventLog[type]) {
+      event.hide = true;
+    }
   };
 
   getDataById = systemId => {
@@ -252,7 +305,7 @@ class DefaultLayout extends Component {
                             primaryData={this.state.primaryData}
                             canMapping={this.state.canMapping}
                             eventLog={this.state.events}
-                            onResetEventLogs={e => this.onResetEventLogs(e)}
+                            onHideEventLogs={e => this.onHideEventLogs(e)}
                           />
                         )}
                       />

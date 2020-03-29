@@ -47,18 +47,18 @@ system.getMetaData().then(metaData => {
         ws.send(JSON.stringify(canMapping));
       });
 
+      //Print info every 10 seconds
+      let printInfoInterval = setInterval(() => {
+        console.log(
+          `${new Date().toLocaleString()}: Sending primary data to the server...`
+        );
+      }, 10000);
+
       // Send primary data on interval
-      let printInfoInterval;
       let primaryDataInterval = setInterval(() => {
         system.getPrimaryData(BMSHWRSN).then(({ primaryData }) => {
           primaryData.forEach(pd => {
             pd.action = 'primary-data';
-            //Print info every 5 seconds
-            printInfoInterval = setInterval(() => {
-              console.log(
-                `${new Date().toLocaleString()}: Sending primary data to the server...`
-              );
-            }, 5000);
             // Send primary data to server
             ws.send(JSON.stringify(pd));
           });

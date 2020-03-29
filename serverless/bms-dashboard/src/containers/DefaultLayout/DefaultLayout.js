@@ -49,17 +49,66 @@ class DefaultLayout extends Component {
   dashboardMessageHandler = message => {
     if (message.BMSHWRSN === this.state.systemId) {
       if ('SOC' in message && 'SOCMax' in message && 'SOCMin' in message) {
-        this.setState(prevState => ({
-          primaryData: { ...message },
-          isSystemOnline: message.IsOnline
-        }));
-        this.processEventLog();
+        if (this.isPrimaryDataNew({ ...message })) {
+          this.setState(prevState => ({
+            primaryData: { ...message },
+            isSystemOnline: message.IsOnline
+          }));
+          this.processEventLog();
+        }
       } else {
+        //No primary data received
         this.setState(prevState => ({
           isSystemOnline: message.IsOnline
         }));
       }
     }
+  };
+
+  isPrimaryDataNew = newPrimaryData => {
+    if (this.state.primaryData.HB1 !== newPrimaryData.HB1) return true;
+    if (this.state.primaryData.SOC !== newPrimaryData.SOC) return true;
+    if (this.state.primaryData.SOCMax !== newPrimaryData.SOCMax) return true;
+    if (this.state.primaryData.SOCMin !== newPrimaryData.SOCMin) return true;
+    if (this.state.primaryData.IChgLimit !== newPrimaryData.IChgLimit)
+      return true;
+    if (this.state.primaryData.IDsgLimit !== newPrimaryData.IDsgLimit)
+      return true;
+    if (this.state.primaryData.HB2 !== newPrimaryData.HB2) return true;
+    if (this.state.primaryData.SOH !== newPrimaryData.SOH) return true;
+    if (this.state.primaryData.SOHMin !== newPrimaryData.SOHMin) return true;
+    if (this.state.primaryData.SOHMax !== newPrimaryData.SOHMax) return true;
+    if (this.state.primaryData.OpStatus !== newPrimaryData.OpStatus)
+      return true;
+    if (this.state.primaryData.RlyStatus !== newPrimaryData.RlyStatus)
+      return true;
+    if (this.state.primaryData.VBattery !== newPrimaryData.VBattery)
+      return true;
+    if (this.state.primaryData.IBattery !== newPrimaryData.IBattery)
+      return true;
+    if (this.state.primaryData.VCellMin !== newPrimaryData.VCellMin)
+      return true;
+    if (this.state.primaryData.VCellMinID !== newPrimaryData.VCellMinID)
+      return true;
+    if (this.state.primaryData.VCellMax !== newPrimaryData.VCellMax)
+      return true;
+    if (this.state.primaryData.VCellMaxID !== newPrimaryData.VCellMaxID)
+      return true;
+    if (this.state.primaryData.TModMin !== newPrimaryData.TModMin) return true;
+    if (this.state.primaryData.TModMax !== newPrimaryData.TModMax) return true;
+    if (this.state.primaryData.TModMinID !== newPrimaryData.TModMinID)
+      return true;
+    if (this.state.primaryData.TModMaxID !== newPrimaryData.TModMaxID)
+      return true;
+    if (this.state.primaryData.TModAvg !== newPrimaryData.TModAvg) return true;
+    if (this.state.primaryData.HIBattery !== newPrimaryData.HIBattery)
+      return true;
+    if (this.state.primaryData.reserved !== newPrimaryData.reserved)
+      return true;
+    if (this.state.primaryData.Alarms !== newPrimaryData.Alarms) return true;
+    if (this.state.primaryData.Warnings !== newPrimaryData.Alarms) return true;
+
+    return false;
   };
 
   onLoading = () => (
@@ -101,8 +150,9 @@ class DefaultLayout extends Component {
   };
 
   addEvent = (status, date, type) => {
-    let bits = this.getBits(status, type);
+    let bits = [];
     if (this.eventLog[type].length === 0) {
+      bits = this.getBits(status, type);
       bits.forEach(bit => {
         this.eventLog[type].push({
           direction: 'Occured',
@@ -113,17 +163,20 @@ class DefaultLayout extends Component {
           hide: false
         });
       });
+      this.updateEventsState();
     } else {
+      bits = this.getBits(status, type);
       this.eventLog[type].forEach(oldEvent => {
         if (!bits.includes(oldEvent.bit)) {
           oldEvent.direction = 'Left';
           oldEvent.date = date;
           oldEvent.hide = false;
+          this.updateEventsState();
         }
       });
       bits.forEach(bit => {
         const bitIndex = this.eventLog[type].findIndex(
-          event => event.bit === bit
+          event => event.bit === bit && event.direction === 'Occured'
         );
         if (bitIndex === -1) {
           this.eventLog[type].unshift({
@@ -134,12 +187,13 @@ class DefaultLayout extends Component {
             bit,
             hide: false
           });
+          this.updateEventsState();
         }
       });
     }
   };
 
-  updateState = () => {
+  updateEventsState = () => {
     this.setState({
       events: {
         Alarm: [...this.eventLog.Alarm],
@@ -200,8 +254,6 @@ class DefaultLayout extends Component {
       this.state.primaryData.Localtime,
       'Alarm'
     );
-
-    this.updateState();
   };
 
   onHideEventLogs = (e, hide) => {
@@ -212,7 +264,7 @@ class DefaultLayout extends Component {
     this.hideEvents('Operating', hide);
     this.hideEvents('Contactor', hide);
 
-    this.updateState();
+    this.updateEventsState();
   };
 
   hideEvents = type => {

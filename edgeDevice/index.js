@@ -48,17 +48,25 @@ system.getMetaData().then(metaData => {
       });
 
       // Send primary data on interval
-      console.log(`Sending primary data to the server...`);
+      let printInfoInterval;
       let primaryDataInterval = setInterval(() => {
         system.getPrimaryData(BMSHWRSN).then(({ primaryData }) => {
           primaryData.forEach(pd => {
             pd.action = 'primary-data';
+            //Print info every 5 seconds
+            printInfoInterval = setInterval(() => {
+              console.log(
+                `${new Date().toLocaleString()}: Sending primary data to the server...`
+              );
+            }, 5000);
+            // Send primary data to server
             ws.send(JSON.stringify(pd));
           });
         });
       }, 5000);
 
       ws.on('close', function close() {
+        clearInterval(printInfoInterval);
         clearInterval(primaryDataInterval);
       });
 

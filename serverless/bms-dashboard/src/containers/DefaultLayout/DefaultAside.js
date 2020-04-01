@@ -13,7 +13,6 @@ import {
   DropdownItem
 } from 'reactstrap';
 import classNames from 'classnames';
-import { AppSwitch } from '@coreui/react';
 
 const defaultProps = {};
 
@@ -36,6 +35,7 @@ class DefaultAside extends Component {
       );
     });
   };
+
   constructMetaData = metaData => {
     return metaData.map(md => {
       return (
@@ -58,6 +58,7 @@ class DefaultAside extends Component {
     this.setState({ dropdownOpen: !this.state.dropdownOpen });
 
   render() {
+    const { src } = this.state;
     return (
       <React.Fragment>
         <Nav tabs>
@@ -96,13 +97,27 @@ class DefaultAside extends Component {
                 {this.props.loading ? (
                   this.props.onLoading()
                 ) : (
-                  <Dropdown
-                    isOpen={this.state.dropdownOpen}
-                    toggle={this.toggleDropdown}
-                  >
-                    <DropdownToggle caret>Systems</DropdownToggle>
-                    <DropdownMenu>{this.constructSystems()}</DropdownMenu>
-                  </Dropdown>
+                  <>
+                    <Dropdown
+                      className='text-center'
+                      isOpen={this.state.dropdownOpen}
+                      toggle={this.toggleDropdown}
+                    >
+                      <DropdownToggle caret>Systems</DropdownToggle>
+                      <DropdownMenu>{this.constructSystems()}</DropdownMenu>
+                    </Dropdown>
+                    {this.props.selectedSystem === '' ? (
+                      <div></div>
+                    ) : (
+                      <div className='mt-2 text-center'>
+                        <img
+                          className='img-avatar'
+                          src={`assets/img/batteries/${this.props.selectedSystem}.png`}
+                          alt='Battery'
+                        ></img>
+                      </div>
+                    )}
+                  </>
                 )}
               </ListGroupItem>
 

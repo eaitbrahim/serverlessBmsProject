@@ -167,7 +167,7 @@ class DefaultLayout extends Component {
     } else {
       bits = this.getBits(status, type);
       this.eventLog[type].forEach(oldEvent => {
-        if (!bits.includes(oldEvent.bit)) {
+        if (!bits.includes(oldEvent.bit) && oldEvent.direction === 'Occured') {
           oldEvent.direction = 'Left';
           oldEvent.date = date;
           oldEvent.hide = false;
@@ -373,6 +373,7 @@ class DefaultLayout extends Component {
             <DefaultAside
               loading={this.state.loading}
               systems={this.state.systems}
+              selectedSystem={this.state.systemId}
               metaData={this.state.metaData}
               onChangeSystem={e => this.changeSystem(e)}
               onLoading={e => this.onLoading()}

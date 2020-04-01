@@ -46,9 +46,10 @@ class WebSocketService {
 
       if (typeListener && typeof typeListener.listener === 'function') {
         typeListener.listener(message);
-      } else {
-        console.log('No handler found for message type');
       }
+      // else {
+      //   console.log('No handler found for message type');
+      // }
     }
   };
 

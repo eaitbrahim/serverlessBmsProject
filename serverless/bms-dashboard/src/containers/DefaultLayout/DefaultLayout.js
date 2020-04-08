@@ -6,7 +6,7 @@ import {
   AppAside,
   AppFooter,
   AppHeader,
-  AppBreadcrumb2 as AppBreadcrumb
+  AppBreadcrumb2 as AppBreadcrumb,
 } from '@coreui/react';
 
 import routes from '../../routes';
@@ -19,10 +19,14 @@ const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
   eventLog = {
+    operatingChanged: false,
+    contactorChanged: false,
+    warningChanged: false,
+    alarmChanged: false,
     Alarm: [],
     Warning: [],
     Operating: [],
-    Contactor: []
+    Contactor: [],
   };
 
   state = {
@@ -35,37 +39,70 @@ class DefaultLayout extends Component {
       Alarm: [],
       Warning: [],
       Operating: [],
-      Contactor: []
+      Contactor: [],
     },
     metaData: {
       identification: [],
       canInfo: [],
       systemDescription: [],
-      productInfo: []
+      productInfo: [],
     },
-    primaryData: {}
+    primaryData: {},
   };
 
-  dashboardMessageHandler = message => {
+  dashboardMessageHandler = (message) => {
     if (message.BMSHWRSN === this.state.systemId) {
       if ('SOC' in message && 'SOCMax' in message && 'SOCMin' in message) {
         if (this.isPrimaryDataNew({ ...message })) {
-          this.setState(prevState => ({
+          this.setState((prevState) => ({
             primaryData: { ...message },
-            isSystemOnline: message.IsOnline
+            isSystemOnline: message.IsOnline,
           }));
-          this.processEventLog();
+
+          if (this.eventLog.operatingChanged) {
+            this.eventLog.alarmChanged = false;
+            this.addEvent(
+              this.state.primaryData.OpStatus,
+              this.state.primaryData.Localtime,
+              'Operating'
+            );
+          }
+
+          if (this.eventLog.contactorChanged) {
+            this.eventLog.contactorChanged = false;
+            this.addEvent(
+              this.state.primaryData.RlyStatus,
+              this.state.primaryData.Localtime,
+              'Contactor'
+            );
+          }
+          if (this.eventLog.warningChanged) {
+            this.eventLog.warningChanged = false;
+            this.addEvent(
+              this.state.primaryData.Warnings,
+              this.state.primaryData.Localtime,
+              'Warning'
+            );
+          }
+          if (this.eventLog.alarmChanged) {
+            this.eventLog.alarmChanged = false;
+            this.addEvent(
+              this.state.primaryData.Alarms,
+              this.state.primaryData.Localtime,
+              'Alarm'
+            );
+          }
         }
       } else {
         //No primary data received
-        this.setState(prevState => ({
-          isSystemOnline: message.IsOnline
+        this.setState((prevState) => ({
+          isSystemOnline: message.IsOnline,
         }));
       }
     }
   };
 
-  isPrimaryDataNew = newPrimaryData => {
+  isPrimaryDataNew = (newPrimaryData) => {
     if (this.state.primaryData.HB1 !== newPrimaryData.HB1) return true;
     if (this.state.primaryData.SOC !== newPrimaryData.SOC) return true;
     if (this.state.primaryData.SOCMax !== newPrimaryData.SOCMax) return true;
@@ -78,10 +115,14 @@ class DefaultLayout extends Component {
     if (this.state.primaryData.SOH !== newPrimaryData.SOH) return true;
     if (this.state.primaryData.SOHMin !== newPrimaryData.SOHMin) return true;
     if (this.state.primaryData.SOHMax !== newPrimaryData.SOHMax) return true;
-    if (this.state.primaryData.OpStatus !== newPrimaryData.OpStatus)
+    if (this.state.primaryData.OpStatus !== newPrimaryData.OpStatus) {
+      this.eventLog.operatingChanged = true;
       return true;
-    if (this.state.primaryData.RlyStatus !== newPrimaryData.RlyStatus)
+    }
+    if (this.state.primaryData.RlyStatus !== newPrimaryData.RlyStatus) {
+      this.eventLog.contactorChanged = true;
       return true;
+    }
     if (this.state.primaryData.VBattery !== newPrimaryData.VBattery)
       return true;
     if (this.state.primaryData.IBattery !== newPrimaryData.IBattery)
@@ -105,8 +146,14 @@ class DefaultLayout extends Component {
       return true;
     if (this.state.primaryData.reserved !== newPrimaryData.reserved)
       return true;
-    if (this.state.primaryData.Alarms !== newPrimaryData.Alarms) return true;
-    if (this.state.primaryData.Warnings !== newPrimaryData.Alarms) return true;
+    if (this.state.primaryData.Alarms !== newPrimaryData.Alarms) {
+      this.eventLog.alarmChanged = true;
+      return true;
+    }
+    if (this.state.primaryData.Warnings !== newPrimaryData.Warnings) {
+      this.eventLog.warningChanged = true;
+      return true;
+    }
 
     return false;
   };
@@ -115,17 +162,17 @@ class DefaultLayout extends Component {
     <div className='animated fadeIn pt-1 text-center'>Loading...</div>
   );
 
-  signOut = e => {
+  signOut = (e) => {
     e.preventDefault();
     this.props.history.push('/login');
   };
 
-  changeSystem = s => {
+  changeSystem = (s) => {
     this.eventLog = {
       Alarm: [],
       Warning: [],
       Operating: [],
-      Contactor: []
+      Contactor: [],
     };
     this.setState({
       isSystemOnline: false,
@@ -136,15 +183,15 @@ class DefaultLayout extends Component {
         Alarm: [],
         Warning: [],
         Operating: [],
-        Contactor: []
+        Contactor: [],
       },
       metaData: {
         identification: [],
         canInfo: [],
         systemDescription: [],
-        productInfo: []
+        productInfo: [],
       },
-      primaryData: {}
+      primaryData: {},
     });
     this.getDataById(s);
   };
@@ -153,20 +200,20 @@ class DefaultLayout extends Component {
     let bits = [];
     if (this.eventLog[type].length === 0) {
       bits = this.getBits(status, type);
-      bits.forEach(bit => {
+      bits.forEach((bit) => {
         this.eventLog[type].push({
           direction: 'Occured',
           date,
           status,
           type,
           bit,
-          hide: false
+          hide: false,
         });
       });
       this.updateEventsState();
     } else {
       bits = this.getBits(status, type);
-      this.eventLog[type].forEach(oldEvent => {
+      this.eventLog[type].forEach((oldEvent) => {
         if (!bits.includes(oldEvent.bit) && oldEvent.direction === 'Occured') {
           oldEvent.direction = 'Left';
           oldEvent.date = date;
@@ -174,9 +221,9 @@ class DefaultLayout extends Component {
           this.updateEventsState();
         }
       });
-      bits.forEach(bit => {
+      bits.forEach((bit) => {
         const bitIndex = this.eventLog[type].findIndex(
-          event => event.bit === bit && event.direction === 'Occured'
+          (event) => event.bit === bit && event.direction === 'Occured'
         );
         if (bitIndex === -1) {
           this.eventLog[type].unshift({
@@ -185,7 +232,7 @@ class DefaultLayout extends Component {
             status,
             type,
             bit,
-            hide: false
+            hide: false,
           });
           this.updateEventsState();
         }
@@ -199,8 +246,8 @@ class DefaultLayout extends Component {
         Alarm: [...this.eventLog.Alarm],
         Warning: [...this.eventLog.Warning],
         Operating: [...this.eventLog.Operating],
-        Contactor: [...this.eventLog.Contactor]
-      }
+        Contactor: [...this.eventLog.Contactor],
+      },
     });
   };
 
@@ -219,7 +266,7 @@ class DefaultLayout extends Component {
     return bits;
   };
 
-  toBinary = integer => {
+  toBinary = (integer) => {
     let result = [];
     if (typeof integer !== 'undefined') {
       let str = integer.toString(2);
@@ -227,7 +274,7 @@ class DefaultLayout extends Component {
         .padStart(32, '0')
         .split('')
         .reverse()
-        .map(r => parseInt(r));
+        .map((r) => parseInt(r));
     }
 
     return result;
@@ -267,29 +314,29 @@ class DefaultLayout extends Component {
     this.updateEventsState();
   };
 
-  hideEvents = type => {
+  hideEvents = (type) => {
     for (let event of this.eventLog[type]) {
       event.hide = true;
     }
   };
 
-  getDataById = systemId => {
+  getDataById = (systemId) => {
     const metaDataPromise = agent.fetchData.metaDataById(systemId);
     const primaryDataPromise = agent.fetchData.lastPrimaryDataById(systemId);
     const canMappingPromise = agent.fetchData.listOfCanMapping(systemId);
 
     this.setState({ loading: true });
     Promise.all([metaDataPromise, primaryDataPromise, canMappingPromise]).then(
-      responses => {
+      (responses) => {
         const { IsOnline, BMSHWRSN } = responses[0].metaData;
         const {
           Identification,
           CANInfo,
           SystemDescription,
-          ProductInfo
+          ProductInfo,
         } = responses[0].metaData.Cluster;
 
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           loading: false,
           isSystemOnline: IsOnline,
           systemId: BMSHWRSN,
@@ -297,10 +344,10 @@ class DefaultLayout extends Component {
             identification: Identification,
             canInfo: CANInfo,
             systemDescription: SystemDescription,
-            productInfo: ProductInfo
+            productInfo: ProductInfo,
           },
           primaryData: { ...responses[1].primaryData },
-          canMapping: [...responses[2].canMapping]
+          canMapping: [...responses[2].canMapping],
         }));
 
         this.processEventLog();
@@ -332,7 +379,7 @@ class DefaultLayout extends Component {
       <div className='app'>
         <AppHeader fixed>
           <Suspense fallback={this.onLoading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} />
+            <DefaultHeader onLogout={(e) => this.signOut(e)} />
           </Suspense>
         </AppHeader>
         <div className='app-body'>
@@ -351,13 +398,13 @@ class DefaultLayout extends Component {
                         render={() => (
                           <route.component
                             loading={this.state.loading}
-                            onLoading={e => this.onLoading()}
+                            onLoading={(e) => this.onLoading()}
                             isSystemOnline={this.state.isSystemOnline}
                             systemId={this.state.systemId}
                             primaryData={this.state.primaryData}
                             canMapping={this.state.canMapping}
                             eventLog={this.state.events}
-                            onHideEventLogs={e => this.onHideEventLogs(e)}
+                            onHideEventLogs={(e) => this.onHideEventLogs(e)}
                           />
                         )}
                       />
@@ -375,8 +422,8 @@ class DefaultLayout extends Component {
               systems={this.state.systems}
               selectedSystem={this.state.systemId}
               metaData={this.state.metaData}
-              onChangeSystem={e => this.changeSystem(e)}
-              onLoading={e => this.onLoading()}
+              onChangeSystem={(e) => this.changeSystem(e)}
+              onLoading={(e) => this.onLoading()}
             />
           </AppAside>
         </div>

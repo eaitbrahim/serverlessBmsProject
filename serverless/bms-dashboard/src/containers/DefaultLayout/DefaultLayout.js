@@ -60,7 +60,7 @@ class DefaultLayout extends Component {
           }));
 
           if (this.eventLog.operatingChanged) {
-            this.eventLog.alarmChanged = false;
+            this.eventLog.operatingChanged = false;
             this.addEvent(
               this.state.primaryData.OpStatus,
               this.state.primaryData.Localtime,
@@ -76,6 +76,7 @@ class DefaultLayout extends Component {
               'Contactor'
             );
           }
+
           if (this.eventLog.warningChanged) {
             this.eventLog.warningChanged = false;
             this.addEvent(
@@ -84,6 +85,7 @@ class DefaultLayout extends Component {
               'Warning'
             );
           }
+
           if (this.eventLog.alarmChanged) {
             this.eventLog.alarmChanged = false;
             this.addEvent(
@@ -208,22 +210,39 @@ class DefaultLayout extends Component {
           type,
           bit,
           hide: false,
+          old: false,
         });
       });
       this.updateEventsState();
     } else {
       bits = this.getBits(status, type);
       this.eventLog[type].forEach((oldEvent) => {
-        if (!bits.includes(oldEvent.bit) && oldEvent.direction === 'Occured') {
-          oldEvent.direction = 'Left';
-          oldEvent.date = date;
+        // Process left events
+        if (
+          !bits.includes(oldEvent.bit) &&
+          !oldEvent.old &&
+          oldEvent.direction === 'Occured'
+        ) {
           oldEvent.hide = false;
+          oldEvent.old = true;
+
+          this.eventLog[type].unshift({
+            direction: 'Left',
+            date,
+            status: oldEvent.status,
+            type: oldEvent.type,
+            bit: oldEvent.bit,
+            hide: false,
+            old: false,
+          });
           this.updateEventsState();
         }
       });
+      // Process occured event
       bits.forEach((bit) => {
         const bitIndex = this.eventLog[type].findIndex(
-          (event) => event.bit === bit && event.direction === 'Occured'
+          (event) =>
+            event.bit === bit && event.direction === 'Occured' && !event.old
         );
         if (bitIndex === -1) {
           this.eventLog[type].unshift({
@@ -233,6 +252,7 @@ class DefaultLayout extends Component {
             type,
             bit,
             hide: false,
+            old: false,
           });
           this.updateEventsState();
         }
@@ -280,7 +300,7 @@ class DefaultLayout extends Component {
     return result;
   };
 
-  processEventLog = () => {
+  processAllEventsLog = () => {
     this.addEvent(
       this.state.primaryData.OpStatus,
       this.state.primaryData.Localtime,
@@ -303,13 +323,13 @@ class DefaultLayout extends Component {
     );
   };
 
-  onHideEventLogs = (e, hide) => {
+  onHideEventLogs = (e) => {
     e.preventDefault();
 
-    this.hideEvents('Alarm', hide);
-    this.hideEvents('Warning', hide);
-    this.hideEvents('Operating', hide);
-    this.hideEvents('Contactor', hide);
+    this.hideEvents('Alarm');
+    this.hideEvents('Warning');
+    this.hideEvents('Operating');
+    this.hideEvents('Contactor');
 
     this.updateEventsState();
   };
@@ -350,7 +370,7 @@ class DefaultLayout extends Component {
           canMapping: [...responses[2].canMapping],
         }));
 
-        this.processEventLog();
+        this.processAllEventsLog();
 
         getWSService().addMessageListener(
           this.state.systemId,

@@ -6,7 +6,7 @@ import warningsData from '../Warnings/warningsData';
 import eventsData from './eventsData';
 
 const EventRow = ({ dataRow }) => {
-  const getBadge = type => {
+  const getBadge = (type) => {
     let color;
     let typeText = type;
     if (type === 'Alarm') {
@@ -29,17 +29,17 @@ const EventRow = ({ dataRow }) => {
   );
 };
 
-const Events = props => {
+const Events = (props) => {
   const getData = (bit, type) => {
     let data;
     if (type === 'Alarm') {
       for (let a of alarmsData) {
-        data = a.byteContent.find(b => b.bit === bit);
+        data = a.byteContent.find((b) => b.bit === bit);
         if (typeof data !== 'undefined') break;
       }
     } else if (type === 'Warning') {
       for (let a of warningsData) {
-        data = a.byteContent.find(b => b.bit === bit);
+        data = a.byteContent.find((b) => b.bit === bit);
         if (typeof data !== 'undefined') {
           break;
         }
@@ -47,7 +47,7 @@ const Events = props => {
     } else {
       for (let a of eventsData) {
         if (a.type === type) {
-          data = a.state.find(a => a.bit === bit);
+          data = a.state.find((a) => a.bit === bit);
           if (typeof data !== 'undefined') {
             break;
           }
@@ -58,7 +58,7 @@ const Events = props => {
     return data;
   };
 
-  const getMessage = events => {
+  const getMessage = (events) => {
     let eventsWithMessage = [];
     for (let event of events) {
       let data = getData(event.bit, event.type);
@@ -85,10 +85,10 @@ const Events = props => {
       ...alarmsWithMessage,
       ...warningsWithMessage,
       ...operatingsWithMessage,
-      ...contactorsWithMessage
+      ...contactorsWithMessage,
     ];
     const filteredEventRow = allEvents.filter(
-      dr =>
+      (dr) =>
         dr.message !== 'NA (NA) - Occured' &&
         dr.message !== 'NA (NA) - Left' &&
         dr.hide === false
@@ -105,7 +105,7 @@ const Events = props => {
           <Button
             color='primary'
             className='float-right'
-            onClick={e => props.onHideEventLogs(e)}
+            onClick={(e) => props.onHideEventLogs(e)}
             disabled={!props.isSystemOnline}
           >
             <i className='icon-refresh'></i> Reset

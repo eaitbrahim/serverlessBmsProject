@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card, CardBody, Table, Badge } from 'reactstrap';
 
-const Battery = props => {
+const Battery = (props) => {
   return (
-    <Card>
+    <Card style={{ minHeight: '315px' }}>
       <CardBody>
         {props.loading ? (
           props.onLoading()
@@ -12,6 +12,7 @@ const Battery = props => {
             hover
             responsive
             className='table-outline mb-0 d-none d-sm-table'
+            style={{ minHeight: '270px' }}
           >
             <tbody>
               <tr>
@@ -21,7 +22,7 @@ const Battery = props => {
                     <div
                       className={`battery-level ${props.class}`}
                       style={{
-                        height: props.SOC > 100 ? '100%' : `${props.SOC}%`
+                        height: props.SOC > 100 ? '100%' : `${props.SOC}%`,
                       }}
                     ></div>
                   </div>
@@ -29,43 +30,45 @@ const Battery = props => {
                     <Badge color={props.color}>{props.message}</Badge>
                   </div>
                 </td>
-                <td>
-                  <p>
-                    <small className='text-muted mr-3'>
-                      <strong>Battery Voltage:</strong>
-                      {props.VBattery + ' ' + props.VBatteryUnit}
-                    </small>
-                  </p>
-                  <p>
-                    <small className='text-muted mr-3'>
-                      <strong>Battery Current:</strong>
-                      {props.IBattery + ' ' + props.IBatteryUnit}
-                    </small>
-                  </p>
-                  <p>
-                    <small className='text-muted mr-3'>
-                      <strong>Max Charge Current:</strong>
-                      {props.IChgLimit + ' ' + props.IChgLimitUnit}
-                    </small>
-                  </p>
-                  <p>
-                    <small className='text-muted mr-3'>
-                      <strong>Max Discharge Current:</strong>
-                      {props.IDsgLimit + ' ' + props.IDsgLimitUnit}
-                    </small>
-                  </p>
-                  <p>
-                    <small className='text-muted mr-3'>
-                      <strong>Operating State:</strong>
-                      {props.OpStatus + ' ' + props.OpStatusUnit}
-                    </small>
-                  </p>
-                  <p>
-                    <small className='text-muted mr-3'>
-                      <strong>Contactor State:</strong>
-                      {props.RlyStatus + ' ' + props.RlyStatusUnit}
-                    </small>
-                  </p>
+                <td style={{ padding: '0' }}>
+                  <table className='table table-borderless'>
+                    <tr>
+                      <td>
+                        <strong>Battery Voltage:</strong>
+                      </td>
+                      <td>{props.VBattery + ' ' + props.VBatteryUnit}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Battery Current:</strong>
+                      </td>
+                      <td>{props.IBattery + ' ' + props.IBatteryUnit}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Max Charge Current:</strong>
+                      </td>
+                      <td>{props.IChgLimit + ' ' + props.IChgLimitUnit}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Max Discharge Current:</strong>
+                      </td>
+                      <td>{props.IDsgLimit + ' ' + props.IDsgLimitUnit}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Operating State:</strong>
+                      </td>
+                      <td>{props.OpStatus + ' ' + props.OpStatusUnit}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Contactor State:</strong>
+                      </td>
+                      <td>{props.RlyStatus + ' ' + props.RlyStatusUnit}</td>
+                    </tr>
+                  </table>
                 </td>
               </tr>
             </tbody>

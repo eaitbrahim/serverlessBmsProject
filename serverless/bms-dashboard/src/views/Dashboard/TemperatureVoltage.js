@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card, CardBody, Table } from 'reactstrap';
 
-const TemperatureVoltage = props => {
+const TemperatureVoltage = (props) => {
   return (
-    <Card>
+    <Card style={{ minHeight: '315px' }}>
       <CardBody>
         {props.loading ? (
           props.onLoading()
@@ -12,6 +12,7 @@ const TemperatureVoltage = props => {
             hover
             responsive
             className='table-outline mb-0 d-none d-sm-table'
+            style={{ minHeight: '270px' }}
           >
             <thead className='thead-light'>
               <tr>
@@ -23,9 +24,7 @@ const TemperatureVoltage = props => {
             <tbody>
               <tr>
                 <td>
-                  <small className='text-muted mr-3'>
-                    <strong>Battery Temperature</strong>
-                  </small>
+                  <strong>Battery Temperature</strong>
                 </td>
                 <td className='text-center'>
                   {props.TModMax} {props.TModMaxUnit}
@@ -38,9 +37,7 @@ const TemperatureVoltage = props => {
               </tr>
               <tr>
                 <td>
-                  <small className='text-muted mr-3'>
-                    <strong>Sensor Index</strong>
-                  </small>
+                  <strong>Sensor Index</strong>
                 </td>
                 <td className='text-center'>{props.TModMaxID}</td>
                 <td>
@@ -49,9 +46,7 @@ const TemperatureVoltage = props => {
               </tr>
               <tr>
                 <td>
-                  <small className='text-muted mr-3'>
-                    <strong>Cell Voltage</strong>
-                  </small>
+                  <strong>Cell Voltage</strong>
                 </td>
                 <td className='text-center'>
                   {props.VCellMax} {props.VCellMaxUnit}
@@ -64,9 +59,7 @@ const TemperatureVoltage = props => {
               </tr>
               <tr>
                 <td>
-                  <small className='text-muted mr-3'>
-                    <strong>Cell Index</strong>
-                  </small>
+                  <strong>Cell Index</strong>
                 </td>
                 <td className='text-center'>{props.VCellMaxID}</td>
                 <td>

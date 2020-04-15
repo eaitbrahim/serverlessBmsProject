@@ -7,8 +7,8 @@ const optionsCircle = {
     id: 'radialBar',
     offsetY: -20,
     sparkline: {
-      enabled: true
-    }
+      enabled: true,
+    },
   },
   plotOptions: {
     radialBar: {
@@ -24,19 +24,19 @@ const optionsCircle = {
           left: 0,
           color: '#999',
           opacity: 1,
-          blur: 2
-        }
+          blur: 2,
+        },
       },
       dataLabels: {
         name: {
-          show: false
+          show: false,
         },
         value: {
           offsetY: -2,
-          fontSize: '22px'
-        }
-      }
-    }
+          fontSize: '22px',
+        },
+      },
+    },
   },
   labels: ['SOC', 'SOH'],
   legend: {
@@ -44,14 +44,14 @@ const optionsCircle = {
     position: 'left',
     offsetX: -40,
     offsetY: -10,
-    formatter: function(val, opts) {
+    formatter: function (val, opts) {
       return val + ' - ' + opts.w.globals.series[opts.seriesIndex] + '%';
-    }
+    },
   },
   grid: {
     padding: {
-      top: -10
-    }
+      top: -10,
+    },
   },
   fill: {
     type: 'gradient',
@@ -61,18 +61,18 @@ const optionsCircle = {
       inverseColors: false,
       opacityFrom: 1,
       opacityTo: 1,
-      stops: [0, 50, 53, 91]
-    }
-  }
+      stops: [0, 50, 53, 91],
+    },
+  },
 };
 
 const loading = () => (
   <div className='animated fadeIn pt-1 text-center'>Loading...</div>
 );
 
-const SocSoh = props => {
+const SocSoh = (props) => {
   return (
-    <Card>
+    <Card style={{ minHeight: '315px' }}>
       {props.loading ? (
         props.onLoading()
       ) : (

@@ -77,6 +77,14 @@ functions:
           method: GET
           cors: true
           private: true
+  http-get-first-primary-data:
+    handler: lambdas/endpoints/getFirstPrimaryData.handler
+    events:
+      - http:
+          path: get-first-primary-data/{BMSHWRSN}
+          method: GET
+          cors: true
+          private: true
   http-get-systems:
     handler: lambdas/endpoints/getSystems.handler
     events:

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardBody } from 'reactstrap';
 
-const IsOnline = props => {
+const IsOnline = (props) => {
   return (
     <Card
       className={
@@ -11,12 +11,10 @@ const IsOnline = props => {
       {props.loading ? (
         props.onLoading()
       ) : (
-        <CardBody>
+        <CardBody style={{ minHeight: '105px' }}>
           <div className='text-value'>
-            <small>
-              {props.systemId} is
-              {props.isSystemOnline ? ' On Line' : ' Off Line'}
-            </small>
+            {props.systemId} is
+            {props.isSystemOnline ? ' On Line' : ' Off Line'}
           </div>
         </CardBody>
       )}

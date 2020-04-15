@@ -7,12 +7,12 @@ import {
   DropdownMenu,
   DropdownToggle,
   Nav,
-  NavItem
+  NavItem,
 } from 'reactstrap';
 import {
   AppAsideToggler,
   AppNavbarBrand,
-  AppSidebarToggler
+  AppSidebarToggler,
 } from '@coreui/react';
 import logo from '../../assets/img/brand/logo.png';
 import sign from '../../assets/img/brand/sign.png';
@@ -29,7 +29,7 @@ class DefaultHeader extends Component {
             src: sign,
             width: 30,
             height: 30,
-            alt: 'Leclanche Logo'
+            alt: 'Leclanche Logo',
           }}
         />
         <Nav className='d-md-down-none' navbar>
@@ -61,11 +61,11 @@ class DefaultHeader extends Component {
           <UncontrolledDropdown nav direction='down'>
             <DropdownToggle nav>
               <img
-                src={'../../assets/img/avatars/6.jpg'}
+                src={'../../assets/img/avatars/7.jpg'}
                 className='img-avatar'
-                alt='admin@bootstrapmaster.com'
+                alt='admin@leclanche.com'
               />
-              Lola Huber
+              Admin Engineer
             </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem header tag='div' className='text-center'>
@@ -78,7 +78,7 @@ class DefaultHeader extends Component {
                 <i className='fa fa-wrench'></i> Settings
               </DropdownItem>
               <DropdownItem divider />
-              <DropdownItem onClick={e => this.props.onLogout(e)}>
+              <DropdownItem onClick={(e) => this.props.onLogout(e)}>
                 <i className='fa fa-lock'></i> Logout
               </DropdownItem>
             </DropdownMenu>

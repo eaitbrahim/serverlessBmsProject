@@ -6,13 +6,13 @@ class Clock extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      time: new Date().toLocaleString()
+      time: new Date().toLocaleString(),
     };
   }
 
   tick() {
     this.setState({
-      time: new Date().toLocaleString()
+      time: new Date().toLocaleString(),
     });
   }
   componentDidMount() {
@@ -26,12 +26,10 @@ class Clock extends Component {
   render() {
     return (
       <Card className='text-white bg-warning'>
-        <CardBody>
+        <CardBody style={{ minHeight: '105px' }}>
           <div className='text-value'>
-            <small>
-              Current date & time{' '}
-              {moment(this.state.time).format('YYYY-MM-DD HH:mm:ss')}
-            </small>
+            Current date & time{' '}
+            {moment(this.state.time).format('YYYY-MM-DD HH:mm:ss')}
           </div>
         </CardBody>
       </Card>

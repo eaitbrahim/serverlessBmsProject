@@ -48,6 +48,7 @@ class DefaultLayout extends Component {
       productInfo: [],
     },
     primaryData: {},
+    firstPrimaryData: {},
   };
 
   dashboardMessageHandler = (message) => {
@@ -194,6 +195,7 @@ class DefaultLayout extends Component {
         productInfo: [],
       },
       primaryData: {},
+      firstPrimaryData: {},
     });
     this.getDataById(s);
   };
@@ -342,42 +344,51 @@ class DefaultLayout extends Component {
 
   getDataById = (systemId) => {
     const metaDataPromise = agent.fetchData.metaDataById(systemId);
-    const primaryDataPromise = agent.fetchData.lastPrimaryDataById(systemId);
+    const lastPrimaryDataPromise = agent.fetchData.lastPrimaryDataById(
+      systemId
+    );
+    const firstPrimaryDataPromise = agent.fetchData.firstPrimaryDataById(
+      systemId
+    );
     const canMappingPromise = agent.fetchData.listOfCanMapping(systemId);
 
     this.setState({ loading: true });
-    Promise.all([metaDataPromise, primaryDataPromise, canMappingPromise]).then(
-      (responses) => {
-        const { IsOnline, BMSHWRSN } = responses[0].metaData;
-        const {
-          Identification,
-          CANInfo,
-          SystemDescription,
-          ProductInfo,
-        } = responses[0].metaData.Cluster;
+    Promise.all([
+      metaDataPromise,
+      lastPrimaryDataPromise,
+      firstPrimaryDataPromise,
+      canMappingPromise,
+    ]).then((responses) => {
+      const { IsOnline, BMSHWRSN } = responses[0].metaData;
+      const {
+        Identification,
+        CANInfo,
+        SystemDescription,
+        ProductInfo,
+      } = responses[0].metaData.Cluster;
 
-        this.setState((prevState) => ({
-          loading: false,
-          isSystemOnline: IsOnline,
-          systemId: BMSHWRSN,
-          metaData: {
-            identification: Identification,
-            canInfo: CANInfo,
-            systemDescription: SystemDescription,
-            productInfo: ProductInfo,
-          },
-          primaryData: { ...responses[1].primaryData },
-          canMapping: [...responses[2].canMapping],
-        }));
+      this.setState((prevState) => ({
+        loading: false,
+        isSystemOnline: IsOnline,
+        systemId: BMSHWRSN,
+        metaData: {
+          identification: Identification,
+          canInfo: CANInfo,
+          systemDescription: SystemDescription,
+          productInfo: ProductInfo,
+        },
+        primaryData: { ...responses[1].primaryData },
+        firstPrimaryData: { ...responses[2].primaryData },
+        canMapping: [...responses[3].canMapping],
+      }));
 
-        this.processAllEventsLog();
+      this.processAllEventsLog();
 
-        getWSService().addMessageListener(
-          this.state.systemId,
-          this.dashboardMessageHandler
-        );
-      }
-    );
+      getWSService().addMessageListener(
+        this.state.systemId,
+        this.dashboardMessageHandler
+      );
+    });
   };
 
   getListOfSystems = () => {
@@ -421,6 +432,7 @@ class DefaultLayout extends Component {
                             onLoading={(e) => this.onLoading()}
                             isSystemOnline={this.state.isSystemOnline}
                             systemId={this.state.systemId}
+                            firstPrimaryData={this.state.firstPrimaryData}
                             primaryData={this.state.primaryData}
                             canMapping={this.state.canMapping}
                             eventLog={this.state.events}

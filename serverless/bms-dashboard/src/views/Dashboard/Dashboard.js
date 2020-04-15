@@ -3,6 +3,7 @@ import { Col, Row } from 'reactstrap';
 
 import IsOnline from './IsOnline';
 import LastTime from './LastTime';
+import FirstTime from './FirstTime';
 import Clock from './Clock';
 import SocSoh from './SocSoh';
 import Battery from './Battery';
@@ -11,15 +12,15 @@ import Alarms from './Alarms/Alarms';
 import Warnings from './Warnings/Warnings';
 import Events from './Events/Events';
 
-const Dashboard = props => {
-  const getUnitFromCanMapping = key => {
-    const canMappingObj = props.canMapping.find(cm => {
+const Dashboard = (props) => {
+  const getUnitFromCanMapping = (key) => {
+    const canMappingObj = props.canMapping.find((cm) => {
       return cm.Key === key;
     });
     return typeof canMappingObj !== 'undefined' ? canMappingObj.Unit : '';
   };
 
-  const toBinary = integer => {
+  const toBinary = (integer) => {
     let result = [];
     if (typeof integer !== 'undefined') {
       let str = integer.toString(2);
@@ -27,7 +28,7 @@ const Dashboard = props => {
         .padStart(32, '0')
         .split('')
         .reverse()
-        .map(r => parseInt(r));
+        .map((r) => parseInt(r));
     }
 
     return result;
@@ -36,24 +37,34 @@ const Dashboard = props => {
   return (
     <div className='animated fadeIn'>
       <Row>
-        <Col xs='12' sm='6' lg='4'>
+        <Col xs='12' sm='6' lg='3'>
           <IsOnline
             isSystemOnline={props.isSystemOnline}
             systemId={props.systemId}
             loading={props.loading}
-            onLoading={e => props.onLoading()}
+            onLoading={(e) => props.onLoading()}
           />
         </Col>
 
-        <Col xs='12' sm='6' lg='4'>
+        <Col xs='12' sm='6' lg='3'>
+          <FirstTime
+            firstDateTime={
+              props.firstPrimaryData ? props.firstPrimaryData.Localtime : ''
+            }
+            loading={props.loading}
+            onLoading={(e) => props.onLoading()}
+          />
+        </Col>
+
+        <Col xs='12' sm='6' lg='3'>
           <LastTime
             lastDateTime={props.primaryData ? props.primaryData.Localtime : ''}
             loading={props.loading}
-            onLoading={e => props.onLoading()}
+            onLoading={(e) => props.onLoading()}
           />
         </Col>
 
-        <Col xs='12' sm='6' lg='4'>
+        <Col xs='12' sm='6' lg='3'>
           <Clock />
         </Col>
       </Row>
@@ -67,7 +78,7 @@ const Dashboard = props => {
             sohMin={props.primaryData.SOHMin}
             sohMax={props.primaryData.SOHMax}
             loading={props.loading}
-            onLoading={e => props.onLoading()}
+            onLoading={(e) => props.onLoading()}
           />
         </Col>
         <Col xs='12' sm='6' lg='4'>
@@ -107,7 +118,7 @@ const Dashboard = props => {
             RlyStatus={props.primaryData.RlyStatus}
             RlyStatusUnit={getUnitFromCanMapping('RlyStatus')}
             loading={props.loading}
-            onLoading={e => props.onLoading()}
+            onLoading={(e) => props.onLoading()}
           />
         </Col>
         <Col xs='12' sm='6' lg='4'>
@@ -125,7 +136,7 @@ const Dashboard = props => {
             VCellMinUnit={getUnitFromCanMapping('VCellMin')}
             VCellMinID={props.primaryData.VCellMinID}
             loading={props.loading}
-            onLoading={e => props.onLoading()}
+            onLoading={(e) => props.onLoading()}
           />
         </Col>
       </Row>
@@ -135,7 +146,7 @@ const Dashboard = props => {
           <Alarms
             alarmStatus={toBinary(props.primaryData.Alarms)}
             loading={props.loading}
-            onLoading={e => props.onLoading()}
+            onLoading={(e) => props.onLoading()}
           />
         </Col>
       </Row>
@@ -145,7 +156,7 @@ const Dashboard = props => {
           <Warnings
             warningStatus={toBinary(props.primaryData.Warnings)}
             loading={props.loading}
-            onLoading={e => props.onLoading()}
+            onLoading={(e) => props.onLoading()}
           />
         </Col>
       </Row>
@@ -156,7 +167,7 @@ const Dashboard = props => {
             isSystemOnline={props.isSystemOnline}
             eventLog={props.eventLog}
             onHideEventLogs={(e, hide) => props.onHideEventLogs(e)}
-            toBinary={i => toBinary(i)}
+            toBinary={(i) => toBinary(i)}
           />
         </Col>
       </Row>

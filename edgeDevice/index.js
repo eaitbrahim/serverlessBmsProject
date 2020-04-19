@@ -50,12 +50,9 @@ mainApp = () => {
       if (metaData.BMSHWRSN !== '') {
         BMSHWRSN = metaData.BMSHWRSN;
         metaData.action = 'meta-data';
-        const ws = new WebSocket(
-          'wss://5xcuq4dlm1.execute-api.eu-central-1.amazonaws.com/dev',
-          {
-            headers: { hostname: BMSHWRSN },
-          }
-        );
+        const ws = new WebSocket(process.env.WSS_URL, {
+          headers: { hostname: BMSHWRSN },
+        });
 
         ws.on('open', function open() {
           console.log(

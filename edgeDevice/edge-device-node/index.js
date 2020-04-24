@@ -53,6 +53,9 @@ mainApp = () => {
         BMSHWRSN = metaData.BMSHWRSN;
         metaData.action = 'meta-data';
         ws = new WebSocket(process.env.WSS_URL, {
+          // ws = new WebSocket(
+          //   'wss://5xcuq4dlm1.execute-api.eu-central-1.amazonaws.com/dev',
+          //   {
           headers: { hostname: BMSHWRSN },
         });
 

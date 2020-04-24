@@ -9,6 +9,5 @@ services:
     environment:
       - WSS_URL=$WSS_URL
     volumes:
-      - dbdata:/usr/src/app/db
-volumes:
-  dbdata:
+      - /Users/elmehdiaitbrahim/Projects/serverlessBmsProject/edgeDevice/edge-device-node/db:/usr/src/app/db
+      - /Users/elmehdiaitbrahim/Projects/serverlessBmsProject/edgeDevice/edge-device-node/db/bms.db:/usr/src/app/db/bms.db

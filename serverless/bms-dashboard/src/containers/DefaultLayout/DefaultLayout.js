@@ -106,59 +106,64 @@ class DefaultLayout extends Component {
   };
 
   isPrimaryDataNew = (newPrimaryData) => {
-    if (this.state.primaryData.HB1 !== newPrimaryData.HB1) return true;
-    if (this.state.primaryData.SOC !== newPrimaryData.SOC) return true;
-    if (this.state.primaryData.SOCMax !== newPrimaryData.SOCMax) return true;
-    if (this.state.primaryData.SOCMin !== newPrimaryData.SOCMin) return true;
+    let changed = false;
+    if (this.state.primaryData.HB1 !== newPrimaryData.HB1) changed = true;
+    if (this.state.primaryData.SOC !== newPrimaryData.SOC) changed = true;
+    if (this.state.primaryData.SOCMax !== newPrimaryData.SOCMax) changed = true;
+    if (this.state.primaryData.SOCMin !== newPrimaryData.SOCMin) changed = true;
     if (this.state.primaryData.IChgLimit !== newPrimaryData.IChgLimit)
-      return true;
+      changed = true;
     if (this.state.primaryData.IDsgLimit !== newPrimaryData.IDsgLimit)
-      return true;
-    if (this.state.primaryData.HB2 !== newPrimaryData.HB2) return true;
-    if (this.state.primaryData.SOH !== newPrimaryData.SOH) return true;
-    if (this.state.primaryData.SOHMin !== newPrimaryData.SOHMin) return true;
-    if (this.state.primaryData.SOHMax !== newPrimaryData.SOHMax) return true;
+      changed = true;
+    if (this.state.primaryData.HB2 !== newPrimaryData.HB2) changed = true;
+    if (this.state.primaryData.SOH !== newPrimaryData.SOH) changed = true;
+    if (this.state.primaryData.SOHMin !== newPrimaryData.SOHMin) changed = true;
+    if (this.state.primaryData.SOHMax !== newPrimaryData.SOHMax) changed = true;
+    if (this.state.primaryData.VBattery !== newPrimaryData.VBattery)
+      changed = true;
+    if (this.state.primaryData.IBattery !== newPrimaryData.IBattery)
+      changed = true;
+    if (this.state.primaryData.VCellMin !== newPrimaryData.VCellMin)
+      changed = true;
+    if (this.state.primaryData.VCellMinID !== newPrimaryData.VCellMinID)
+      changed = true;
+    if (this.state.primaryData.VCellMax !== newPrimaryData.VCellMax)
+      changed = true;
+    if (this.state.primaryData.VCellMaxID !== newPrimaryData.VCellMaxID)
+      changed = true;
+    if (this.state.primaryData.TModMin !== newPrimaryData.TModMin)
+      changed = true;
+    if (this.state.primaryData.TModMax !== newPrimaryData.TModMax)
+      changed = true;
+    if (this.state.primaryData.TModMinID !== newPrimaryData.TModMinID)
+      changed = true;
+    if (this.state.primaryData.TModMaxID !== newPrimaryData.TModMaxID)
+      changed = true;
+    if (this.state.primaryData.TModAvg !== newPrimaryData.TModAvg)
+      changed = true;
+    if (this.state.primaryData.HIBattery !== newPrimaryData.HIBattery)
+      changed = true;
+    if (this.state.primaryData.reserved !== newPrimaryData.reserved)
+      changed = true;
     if (this.state.primaryData.OpStatus !== newPrimaryData.OpStatus) {
       this.eventLog.operatingChanged = true;
-      return true;
+      changed = true;
     }
     if (this.state.primaryData.RlyStatus !== newPrimaryData.RlyStatus) {
       this.eventLog.contactorChanged = true;
-      return true;
+      changed = true;
     }
-    if (this.state.primaryData.VBattery !== newPrimaryData.VBattery)
-      return true;
-    if (this.state.primaryData.IBattery !== newPrimaryData.IBattery)
-      return true;
-    if (this.state.primaryData.VCellMin !== newPrimaryData.VCellMin)
-      return true;
-    if (this.state.primaryData.VCellMinID !== newPrimaryData.VCellMinID)
-      return true;
-    if (this.state.primaryData.VCellMax !== newPrimaryData.VCellMax)
-      return true;
-    if (this.state.primaryData.VCellMaxID !== newPrimaryData.VCellMaxID)
-      return true;
-    if (this.state.primaryData.TModMin !== newPrimaryData.TModMin) return true;
-    if (this.state.primaryData.TModMax !== newPrimaryData.TModMax) return true;
-    if (this.state.primaryData.TModMinID !== newPrimaryData.TModMinID)
-      return true;
-    if (this.state.primaryData.TModMaxID !== newPrimaryData.TModMaxID)
-      return true;
-    if (this.state.primaryData.TModAvg !== newPrimaryData.TModAvg) return true;
-    if (this.state.primaryData.HIBattery !== newPrimaryData.HIBattery)
-      return true;
-    if (this.state.primaryData.reserved !== newPrimaryData.reserved)
-      return true;
+
     if (this.state.primaryData.Alarms !== newPrimaryData.Alarms) {
       this.eventLog.alarmChanged = true;
-      return true;
+      changed = true;
     }
     if (this.state.primaryData.Warnings !== newPrimaryData.Warnings) {
       this.eventLog.warningChanged = true;
-      return true;
+      changed = true;
     }
 
-    return false;
+    return changed;
   };
 
   onLoading = () => (
@@ -212,7 +217,6 @@ class DefaultLayout extends Component {
           type,
           bit,
           hide: false,
-          old: false,
         });
       });
       this.updateEventsState();
@@ -220,22 +224,14 @@ class DefaultLayout extends Component {
       bits = this.getBits(status, type);
       this.eventLog[type].forEach((oldEvent) => {
         // Process left events
-        if (
-          !bits.includes(oldEvent.bit) &&
-          !oldEvent.old &&
-          oldEvent.direction === 'Occured'
-        ) {
-          oldEvent.hide = false;
-          oldEvent.old = true;
-
+        if (!bits.includes(oldEvent.bit) && oldEvent.direction === 'Occured') {
           this.eventLog[type].unshift({
             direction: 'Left',
             date,
-            status: oldEvent.status,
-            type: oldEvent.type,
+            status,
+            type,
             bit: oldEvent.bit,
             hide: false,
-            old: false,
           });
           this.updateEventsState();
         }
@@ -244,7 +240,7 @@ class DefaultLayout extends Component {
       bits.forEach((bit) => {
         const bitIndex = this.eventLog[type].findIndex(
           (event) =>
-            event.bit === bit && event.direction === 'Occured' && !event.old
+            event.bit === bit && event.direction === 'Occured' && !event.hide
         );
         if (bitIndex === -1) {
           this.eventLog[type].unshift({
@@ -254,7 +250,6 @@ class DefaultLayout extends Component {
             type,
             bit,
             hide: false,
-            old: false,
           });
           this.updateEventsState();
         }

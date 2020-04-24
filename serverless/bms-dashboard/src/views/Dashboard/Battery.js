@@ -32,42 +32,44 @@ const Battery = (props) => {
                 </td>
                 <td style={{ padding: '0' }}>
                   <table className='table table-borderless'>
-                    <tr>
-                      <td>
-                        <strong>Battery Voltage:</strong>
-                      </td>
-                      <td>{props.VBattery + ' ' + props.VBatteryUnit}</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <strong>Battery Current:</strong>
-                      </td>
-                      <td>{props.IBattery + ' ' + props.IBatteryUnit}</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <strong>Max Charge Current:</strong>
-                      </td>
-                      <td>{props.IChgLimit + ' ' + props.IChgLimitUnit}</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <strong>Max Discharge Current:</strong>
-                      </td>
-                      <td>{props.IDsgLimit + ' ' + props.IDsgLimitUnit}</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <strong>Operating State:</strong>
-                      </td>
-                      <td>{props.OpStatus + ' ' + props.OpStatusUnit}</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <strong>Contactor State:</strong>
-                      </td>
-                      <td>{props.RlyStatus + ' ' + props.RlyStatusUnit}</td>
-                    </tr>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <strong>Battery Voltage:</strong>
+                        </td>
+                        <td>{props.VBattery + ' ' + props.VBatteryUnit}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong>Battery Current:</strong>
+                        </td>
+                        <td>{props.IBattery + ' ' + props.IBatteryUnit}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong>Max Charge Current:</strong>
+                        </td>
+                        <td>{props.IChgLimit + ' ' + props.IChgLimitUnit}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong>Max Discharge Current:</strong>
+                        </td>
+                        <td>{props.IDsgLimit + ' ' + props.IDsgLimitUnit}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong>Operating State:</strong>
+                        </td>
+                        <td>{props.OpStatus + ' ' + props.OpStatusUnit}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong>Contactor State:</strong>
+                        </td>
+                        <td>{props.RlyStatus + ' ' + props.RlyStatusUnit}</td>
+                      </tr>
+                    </tbody>
                   </table>
                 </td>
               </tr>

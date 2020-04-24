@@ -1,7 +1,7 @@
 const AppDAO = require('./dao');
 const Repository = require('./repository');
 
-const dao = new AppDAO(process.env.DB_PATH);
+const dao = new AppDAO('./db/bms.db');
 const repo = new Repository(dao);
 
 const getMetaData = () => {

@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  edge-device-node:
+    image: eaitbrahim/edge-device-node
+    container_name: edge-device-node
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - WSS_URL=$WSS_URL
+    volumes:
+      - dbdata:/usr/src/app/db
+volumes:
+  dbdata:

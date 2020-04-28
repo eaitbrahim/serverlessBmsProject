@@ -49,11 +49,15 @@ class DefaultLayout extends Component {
     },
     primaryData: {},
     firstPrimaryData: {},
+    lastDateTime: '',
   };
 
   dashboardMessageHandler = (message) => {
     if (message.BMSHWRSN === this.state.systemId) {
       if ('SOC' in message && 'SOCMax' in message && 'SOCMin' in message) {
+        this.setState((prevState) => ({
+          lastDateTime: message.Localtime,
+        }));
         if (this.isPrimaryDataNew({ ...message })) {
           this.setState((prevState) => ({
             primaryData: { ...message },
@@ -217,6 +221,7 @@ class DefaultLayout extends Component {
           type,
           bit,
           hide: false,
+          old: false,
         });
       });
       this.updateEventsState();
@@ -224,7 +229,12 @@ class DefaultLayout extends Component {
       bits = this.getBits(status, type);
       this.eventLog[type].forEach((oldEvent) => {
         // Process left events
-        if (!bits.includes(oldEvent.bit) && oldEvent.direction === 'Occured') {
+        if (
+          !bits.includes(oldEvent.bit) &&
+          oldEvent.direction === 'Occured' &&
+          !oldEvent.old
+        ) {
+          oldEvent.old = true;
           this.eventLog[type].unshift({
             direction: 'Left',
             date,
@@ -232,15 +242,17 @@ class DefaultLayout extends Component {
             type,
             bit: oldEvent.bit,
             hide: false,
+            old: false,
           });
           this.updateEventsState();
         }
       });
       // Process occured event
       bits.forEach((bit) => {
-        const bitIndex = this.eventLog[type].findIndex(
+        let bitIndex = -1;
+        bitIndex = this.eventLog[type].findIndex(
           (event) =>
-            event.bit === bit && event.direction === 'Occured' && !event.hide
+            event.bit === bit && event.direction === 'Occured' && !event.old
         );
         if (bitIndex === -1) {
           this.eventLog[type].unshift({
@@ -250,6 +262,7 @@ class DefaultLayout extends Component {
             type,
             bit,
             hide: false,
+            old: false,
           });
           this.updateEventsState();
         }
@@ -373,6 +386,7 @@ class DefaultLayout extends Component {
           productInfo: ProductInfo,
         },
         primaryData: { ...responses[1].primaryData },
+        lastDateTime: responses[1].primaryData.Localtime,
         firstPrimaryData: { ...responses[2].primaryData },
         canMapping: [...responses[3].canMapping],
       }));
@@ -427,6 +441,7 @@ class DefaultLayout extends Component {
                             onLoading={(e) => this.onLoading()}
                             isSystemOnline={this.state.isSystemOnline}
                             systemId={this.state.systemId}
+                            lastDateTime={this.state.lastDateTime}
                             firstPrimaryData={this.state.firstPrimaryData}
                             primaryData={this.state.primaryData}
                             canMapping={this.state.canMapping}

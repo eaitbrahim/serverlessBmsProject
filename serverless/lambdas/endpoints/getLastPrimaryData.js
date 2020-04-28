@@ -1,7 +1,7 @@
 const Responses = require('../common/API_Responses');
 const Dynamo = require('../common/Dynamo');
 
-exports.handler = async event => {
+exports.handler = async (event) => {
   console.log('event', event);
   if (!event.pathParameters || !event.pathParameters.BMSHWRSN) {
     return Responses._400({ message: 'missing the BMSHWRSN from the path.' });
@@ -13,15 +13,14 @@ exports.handler = async event => {
       TableName: process.env.tableNamePrimaryData,
       KeyConditionExpression: '#BMSHWRSN = :BMSHWRSN',
       ExpressionAttributeNames: {
-        '#BMSHWRSN': 'BMSHWRSN'
+        '#BMSHWRSN': 'BMSHWRSN',
       },
       ExpressionAttributeValues: {
-        ':BMSHWRSN': BMSHWRSN
+        ':BMSHWRSN': BMSHWRSN,
       },
       ScanIndexForward: false,
-      Limit: 1
+      Limit: 1,
     };
-    console.log('params:', params);
     const result = await Dynamo.query(params);
 
     if (!result) {

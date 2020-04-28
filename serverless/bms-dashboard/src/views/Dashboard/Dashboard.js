@@ -58,7 +58,7 @@ const Dashboard = (props) => {
 
         <Col xs='12' sm='6' lg='3'>
           <LastTime
-            lastDateTime={props.primaryData ? props.primaryData.Localtime : ''}
+            lastDateTime={props.lastDateTime}
             loading={props.loading}
             onLoading={(e) => props.onLoading()}
           />

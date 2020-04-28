@@ -33,15 +33,15 @@ class WebSocketService {
     }
     this.messageListeners.push({
       systemId,
-      listener
+      listener,
     });
   };
 
-  onMessage = data => {
+  onMessage = (data) => {
     if (data) {
       const message = JSON.parse(data.data);
       const typeListener = this.messageListeners.find(
-        listener => listener.systemId === message.BMSHWRSN
+        (listener) => listener.systemId === message.BMSHWRSN
       );
 
       if (typeListener && typeof typeListener.listener === 'function') {

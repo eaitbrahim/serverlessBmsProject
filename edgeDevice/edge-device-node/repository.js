@@ -25,11 +25,13 @@ class Repository {
       SyncComment,
       Processing,
       Processed,
-      primaryData
+      primaryData,
     } = syncLog;
-    const dataToInsert = primaryData.map(p => {
+    const dataToInsert = primaryData.map((p) => {
       return `('${BMSHWRSN}', ${p}, ${SyncDate}, '${SyncComment}', ${Processing}, ${Processed})`;
     });
+
+    if (dataToInsert.length === 0) return;
 
     return this.dao.run(
       `INSERT INTO SyncLog (SystemId, PrimaryDataId, SyncDate, SyncComment, Processing, Processed) VALUES ${dataToInsert.join(
@@ -41,7 +43,7 @@ class Repository {
 
   createPrimaryData(primaryData) {
     console.log('create data...');
-    const dataToInsert = primaryData.map(p => {
+    const dataToInsert = primaryData.map((p) => {
       return `(
       '${p.Localtime}', 
       ${p.HB1}, 
@@ -75,6 +77,8 @@ class Repository {
       '${p.SystemId}'
       )`;
     });
+
+    if (dataToInsert.length === 0) return;
 
     return this.dao.run(
       `INSERT INTO PrimaryData (
@@ -119,8 +123,10 @@ class Repository {
       SyncComment,
       Processing,
       Processed,
-      primaryData
+      primaryData,
     } = syncLog;
+
+    if (primaryData.length === 0) return;
     return this.dao.run(
       `UPDATE SyncLog SET SyncDate=?, SyncComment=?, Processing=?, Processed=? WHERE SystemId = ? AND PrimaryDataId IN (${primaryData.join(
         ','
@@ -140,7 +146,7 @@ class Repository {
   deleteOldPrimaryDate(fromDate) {
     console.log('Deleting old primary data...');
     return this.dao.run(`DELETE FROM PrimaryData WHERE CreatedAt <= ?`, [
-      fromDate
+      fromDate,
     ]);
   }
 }

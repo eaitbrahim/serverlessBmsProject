@@ -42,7 +42,6 @@ class Repository {
   }
 
   createPrimaryData(primaryData) {
-    console.log('create data...');
     const dataToInsert = primaryData.map((p) => {
       return `(
       '${p.Localtime}', 
@@ -136,7 +135,6 @@ class Repository {
   }
 
   deleteOldSyncLog(fromDate) {
-    console.log('Deleting logs...');
     return this.dao.run(
       `DELETE FROM SyncLog WHERE SyncDate <= ? AND Processing = 1 AND Processed = 1`,
       [fromDate]
@@ -144,7 +142,6 @@ class Repository {
   }
 
   deleteOldPrimaryDate(fromDate) {
-    console.log('Deleting old primary data...');
     return this.dao.run(`DELETE FROM PrimaryData WHERE CreatedAt <= ?`, [
       fromDate,
     ]);

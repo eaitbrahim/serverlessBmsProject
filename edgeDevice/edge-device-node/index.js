@@ -18,7 +18,7 @@ heartbeat = async () => {
     renewWebSocket();
   }
 
-  if (!connectionStatus) {
+  if (!connectionStatus && !terminateWebSocket) {
     console.log(
       `${new Date().toLocaleString()}: No connection to the internet.`
     );
@@ -32,7 +32,7 @@ renewWebSocket = () => {
   if (terminateWebSocket) {
     ws.terminate();
     console.log(
-      `${new Date().toLocaleString()}: terminating old connections...`
+      `${new Date().toLocaleString()}: terminating old connection for system...`
     );
     ws = new WebSocket(process.env.WSS_URL, {
       // ws = new WebSocket(
@@ -44,6 +44,7 @@ renewWebSocket = () => {
       ws.close();
     });
     ws.on('close', function close() {
+      terminateWebSocket = false;
       mainApp();
     });
   } else {
@@ -102,14 +103,14 @@ mainApp = () => {
             canMapping.BMSHWRSN = BMSHWRSN;
             canMapping.action = 'can-mapping';
             console.log(
-              `${new Date().toLocaleString()}: Sending can mapping to the server.`
+              `${new Date().toLocaleString()}: Sending can mapping to the server for system ${BMSHWRSN}.`
             );
             ws.send(JSON.stringify(canMapping));
           });
 
           // Send primary data on interval
           console.log(
-            `${new Date().toLocaleString()}: Sending primary data to the server...`
+            `${new Date().toLocaleString()}: Sending primary data to the server for system ${BMSHWRSN}.`
           );
 
           primaryDataInterval = setInterval(() => {
@@ -123,16 +124,22 @@ mainApp = () => {
 
           ws.on('close', function close() {
             console.log(
-              `${new Date().toLocaleString()}: Websocket closed. Re-connect...`
+              `${new Date().toLocaleString()}: Websocket closed for system ${BMSHWRSN}. Re-connect...`
             );
-            terminateWebSocket = true;
-            renewWebSocket();
+            if (!terminateWebSocket) {
+              terminateWebSocket = true;
+              renewWebSocket();
+            }
           });
 
           ws.on('error', function (error) {
-            console.log(`${new Date().toLocaleString()}: Error: ${error}`);
-            terminateWebSocket = true;
-            renewWebSocket();
+            console.log(
+              `${new Date().toLocaleString()}: Error for system ${BMSHWRSN}: ${error}`
+            );
+            if (!terminateWebSocket) {
+              terminateWebSocket = true;
+              renewWebSocket();
+            }
           });
 
           // Receive data from server
@@ -143,17 +150,19 @@ mainApp = () => {
                 system.setProcessedData(jData);
               } else {
                 console.log(
-                  `${new Date().toLocaleString()}: data does not have ids: ${data}`
+                  `${new Date().toLocaleString()}: data does not have ids for system ${BMSHWRSN}: ${data}`
                 );
                 terminateWebSocket = true;
                 renewWebSocket();
               }
             } catch (e) {
               console.log(
-                `${new Date().toLocaleString()}: data is not JSON object: ${data}`
+                `${new Date().toLocaleString()}: data is not a JSON object for system ${BMSHWRSN}: ${data}`
               );
-              terminateWebSocket = true;
-              renewWebSocket();
+              if (!terminateWebSocket) {
+                terminateWebSocket = true;
+                renewWebSocket();
+              }
             }
           });
         });

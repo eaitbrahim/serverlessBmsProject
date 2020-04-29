@@ -56,7 +56,7 @@ CREATE TABLE "SyncLog" (
 	"SyncComment"	TEXT,
 	"Processing"	INTEGER NOT NULL DEFAULT 0,
 	"Processed"	INTEGER NOT NULL DEFAULT 0,
-	PRIMARY KEY("SystemId","PrimaryDataId")
+	PRIMARY KEY("SystemId")
 );
 
 INSERT INTO MetaData  (Cluster, "Key", "Value") VALUES 

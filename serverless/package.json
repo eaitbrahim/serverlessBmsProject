@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/eaitbrahim/serverlessBmsProject#readme",
   "dependencies": {
-    "aws-sdk": "^2.625.0"
+    "aws-sdk": "^2.814.0"
   },
   "devDependencies": {
     "serverless-s3-sync": "^1.10.6"
